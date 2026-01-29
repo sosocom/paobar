@@ -1,0 +1,3674 @@
+{
+  "version": "2.6",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": 0,
+      "y": 0,
+      "name": "Frame",
+      "clip": true,
+      "width": 800,
+      "height": 600,
+      "fill": "#FFFFFF",
+      "layout": "none"
+    },
+    {
+      "type": "frame",
+      "id": "ek6RR",
+      "x": 0,
+      "y": 0,
+      "name": "谱库页面",
+      "width": 375,
+      "height": 812,
+      "fill": "#0A0A0A",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "f1WO0",
+          "name": "header",
+          "width": "fill_container",
+          "fill": "#18181B",
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            60,
+            20,
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "JUhb1",
+              "name": "title",
+              "fill": "#FAFAFA",
+              "content": "谱库",
+              "fontFamily": "Inter",
+              "fontSize": 34,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "HVTN0",
+              "name": "searchBar",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "#27272A",
+              "cornerRadius": 16,
+              "gap": 8,
+              "padding": [
+                0,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "kTltH",
+                  "name": "searchIcon",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "search",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "93BRg",
+                  "name": "searchText",
+                  "fill": "#71717A",
+                  "content": "搜索歌曲、艺人",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "XTszu",
+          "name": "filterRow",
+          "width": "fill_container",
+          "gap": 8,
+          "padding": [
+            12,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "Hex09",
+              "name": "filter1",
+              "height": 28,
+              "fill": "#DC2626",
+              "cornerRadius": 20,
+              "padding": [
+                0,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "OisY1",
+                  "name": "filterText1",
+                  "fill": "#FAFAFA",
+                  "content": "全部",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tCOnI",
+              "name": "filter2",
+              "height": 28,
+              "fill": "#27272A",
+              "cornerRadius": 20,
+              "padding": [
+                0,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Q6MWf",
+                  "name": "filterText2",
+                  "fill": "#A1A1AA",
+                  "content": "流行",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Z64jX",
+              "name": "filter3",
+              "height": 28,
+              "fill": "#27272A",
+              "cornerRadius": 20,
+              "padding": [
+                0,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "bESiE",
+                  "name": "filterText3",
+                  "fill": "#A1A1AA",
+                  "content": "民谣",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XcboU",
+              "name": "filter4",
+              "height": 28,
+              "fill": "#27272A",
+              "cornerRadius": 20,
+              "padding": [
+                0,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "hDDwX",
+                  "name": "filterText4",
+                  "fill": "#A1A1AA",
+                  "content": "摇滚",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "rwL7I",
+          "name": "contentArea",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            16,
+            100,
+            16
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "rgsez",
+              "name": "songCard1",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#27272A"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 12,
+              "padding": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "xCLtM",
+                  "name": "coverImage1",
+                  "width": 60,
+                  "height": 60,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "./images/generated-1769677479110.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 12
+                },
+                {
+                  "type": "frame",
+                  "id": "x5Jcr",
+                  "name": "songInfo1",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "2QnLQ",
+                      "name": "songTitle1",
+                      "fill": "#FAFAFA",
+                      "content": "小情歌",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "cjkRP",
+                      "name": "artistName1",
+                      "fill": "#71717A",
+                      "content": "苏打绿",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fs6XM",
+                      "name": "difficultyRow1",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "FMv5h",
+                          "name": "star1",
+                          "width": 12,
+                          "height": 12,
+                          "iconFontName": "star",
+                          "iconFontFamily": "lucide",
+                          "fill": "#DC2626"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "oei23",
+                          "name": "star2",
+                          "width": 12,
+                          "height": 12,
+                          "iconFontName": "star",
+                          "iconFontFamily": "lucide",
+                          "fill": "#DC2626"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "iNz0K",
+                          "name": "star3",
+                          "width": 12,
+                          "height": 12,
+                          "iconFontName": "star",
+                          "iconFontFamily": "lucide",
+                          "fill": "#3F3F46"
+                        },
+                        {
+                          "type": "text",
+                          "id": "snyMA",
+                          "name": "diffText1",
+                          "fill": "#71717A",
+                          "content": "C大调 · 4个和弦",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JSDGA",
+              "name": "songCard2",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#27272A"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 12,
+              "padding": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "nLUnh",
+                  "name": "coverImage2",
+                  "width": 60,
+                  "height": 60,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "./images/generated-1769677486434.png",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 12
+                },
+                {
+                  "type": "frame",
+                  "id": "nEs6l",
+                  "name": "songInfo2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DUSTg",
+                      "name": "songTitle2",
+                      "fill": "#FAFAFA",
+                      "content": "成都",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "y8a2F",
+                      "name": "artistName2",
+                      "fill": "#71717A",
+                      "content": "赵雷",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "hhMQt",
+                      "name": "difficultyRow2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "Mz9Ww",
+                          "name": "star21",
+                          "width": 12,
+                          "height": 12,
+                          "iconFontName": "star",
+                          "iconFontFamily": "lucide",
+                          "fill": "#DC2626"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "q5kur",
+                          "name": "star22",
+                          "width": 12,
+                          "height": 12,
+                          "iconFontName": "star",
+                          "iconFontFamily": "lucide",
+                          "fill": "#DC2626"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "04Vtc",
+                          "name": "star23",
+                          "width": 12,
+                          "height": 12,
+                          "iconFontName": "star",
+                          "iconFontFamily": "lucide",
+                          "fill": "#DC2626"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Z7jNJ",
+                          "name": "diffText2",
+                          "fill": "#71717A",
+                          "content": "C大调 · 6个和弦",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "nYans",
+          "name": "navBar",
+          "width": "fill_container",
+          "height": 83,
+          "fill": "#09090B",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#27272A"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "padding": [
+            0,
+            0,
+            34,
+            0
+          ],
+          "justifyContent": "space_around",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Fps0k",
+              "name": "navItem1",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "CfUhP",
+                  "name": "navIcon1",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "book-open",
+                  "iconFontFamily": "lucide",
+                  "fill": "#DC2626"
+                },
+                {
+                  "type": "text",
+                  "id": "OjbSr",
+                  "name": "navLabel1",
+                  "fill": "#DC2626",
+                  "content": "谱库",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "IXktS",
+              "name": "navItem2",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "JYFkS",
+                  "name": "navIcon2",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "list-music",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "cnIpW",
+                  "name": "navLabel2",
+                  "fill": "#71717A",
+                  "content": "歌单",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "a3iNc",
+              "name": "navItem3",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "WFcZS",
+                  "name": "navIcon3",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "user",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "Q4bbd",
+                  "name": "navLabel3",
+                  "fill": "#71717A",
+                  "content": "我的",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "AnG6M",
+      "x": 400,
+      "y": 0,
+      "name": "歌单页面",
+      "width": 375,
+      "height": 812,
+      "fill": "#0A0A0A",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "led9y",
+          "name": "playlistHeader",
+          "width": "fill_container",
+          "fill": "#18181B",
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            60,
+            20,
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "iTzXn",
+              "name": "playlistTitle",
+              "fill": "#FAFAFA",
+              "content": "歌单",
+              "fontFamily": "Inter",
+              "fontSize": 34,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "2amiC",
+          "name": "playlistContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            16,
+            20,
+            100,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "UtUJh",
+              "name": "myPlaylistSection",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "tIXdZ",
+                  "name": "myPlaylistHeader",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Ic6jM",
+                      "name": "myPlaylistLabel",
+                      "fill": "#FAFAFA",
+                      "content": "🎸 我的歌单",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iBNTm",
+                      "name": "addButton",
+                      "width": 28,
+                      "height": 28,
+                      "fill": "#DC2626",
+                      "cornerRadius": 16,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "MSK9Y",
+                          "name": "addIcon",
+                          "width": 18,
+                          "height": 18,
+                          "iconFontName": "plus",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "j3mjL",
+                  "name": "playlist1",
+                  "width": "fill_container",
+                  "fill": "#18181B",
+                  "cornerRadius": 16,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#27272A"
+                  },
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 10
+                  },
+                  "gap": 12,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Zd6oM",
+                      "name": "playlistCover1",
+                      "width": 60,
+                      "height": 60,
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 135,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#DC2626",
+                            "position": 0
+                          },
+                          {
+                            "color": "#991B1B",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "cornerRadius": 12,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "iL180",
+                          "name": "playlistIcon1",
+                          "width": 28,
+                          "height": 28,
+                          "iconFontName": "music",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wjibt",
+                      "name": "playlistInfo1",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "z1itT",
+                          "name": "playlistName1",
+                          "fill": "#FAFAFA",
+                          "content": "新学的歌",
+                          "fontFamily": "Inter",
+                          "fontSize": 17,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "zjHuR",
+                          "name": "playlistCount1",
+                          "fill": "#71717A",
+                          "content": "12 首歌曲",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "TXQlc",
+                      "name": "chevron1",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "#52525B"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "TcPbc",
+                  "name": "playlist2",
+                  "width": "fill_container",
+                  "fill": "#18181B",
+                  "cornerRadius": 16,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#27272A"
+                  },
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 10
+                  },
+                  "gap": 12,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "EYlzt",
+                      "name": "playlistCover2",
+                      "width": 60,
+                      "height": 60,
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 135,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#7C3AED",
+                            "position": 0
+                          },
+                          {
+                            "color": "#DC2626",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "cornerRadius": 12,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "JhPWG",
+                          "name": "playlistIcon2",
+                          "width": 28,
+                          "height": 28,
+                          "iconFontName": "heart",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "x82RK",
+                      "name": "playlistInfo2",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "s5LLb",
+                          "name": "playlistName2",
+                          "fill": "#FAFAFA",
+                          "content": "最爱民谣",
+                          "fontFamily": "Inter",
+                          "fontSize": 17,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "cto7f",
+                          "name": "playlistCount2",
+                          "fill": "#71717A",
+                          "content": "8 首歌曲",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "PFntz",
+                      "name": "chevron2",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "#52525B"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cMAnx",
+              "name": "aiPlaylistSection",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "pPPRD",
+                  "name": "aiPlaylistHeader",
+                  "width": "fill_container",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "dNOv8",
+                      "name": "aiIcon",
+                      "fill": "#FAFAFA",
+                      "content": "🤖",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "9H35N",
+                      "name": "aiPlaylistLabel",
+                      "fill": "#FAFAFA",
+                      "content": "AI 智能歌单",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "AWb3i",
+                  "name": "aiPlaylist1",
+                  "width": "fill_container",
+                  "fill": "#18181B",
+                  "cornerRadius": 16,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#27272A"
+                  },
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 10
+                  },
+                  "gap": 12,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "hpPn4",
+                      "name": "aiCover1",
+                      "width": 60,
+                      "height": 60,
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 135,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#DC2626",
+                            "position": 0
+                          },
+                          {
+                            "color": "#EA580C",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "cornerRadius": 12,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Sc9A8",
+                          "name": "progressionText1",
+                          "fill": "#FFFFFF",
+                          "content": "1564",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "PEsM0",
+                      "name": "aiInfo1",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "QOfUL",
+                          "name": "aiName1",
+                          "fill": "#FAFAFA",
+                          "content": "1-5-6-4 走向",
+                          "fontFamily": "Inter",
+                          "fontSize": 17,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Hj1kd",
+                          "name": "aiDesc1",
+                          "fill": "#71717A",
+                          "content": "卡农走向 · 25 首歌曲",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "rgQTf",
+                      "name": "chevron3",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "#52525B"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WHimv",
+                  "name": "aiPlaylist2",
+                  "width": "fill_container",
+                  "fill": "#18181B",
+                  "cornerRadius": 16,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#27272A"
+                  },
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 10
+                  },
+                  "gap": 12,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "etDGd",
+                      "name": "aiCover2",
+                      "width": 60,
+                      "height": 60,
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 135,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#10B981",
+                            "position": 0
+                          },
+                          {
+                            "color": "#DC2626",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "cornerRadius": 12,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cuaD0",
+                          "name": "progressionText2",
+                          "fill": "#FFFFFF",
+                          "content": "1645",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "9L8f0",
+                      "name": "aiInfo2",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "mBVji",
+                          "name": "aiName2",
+                          "fill": "#FAFAFA",
+                          "content": "1-6-4-5 走向",
+                          "fontFamily": "Inter",
+                          "fontSize": 17,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "2xSY7",
+                          "name": "aiDesc2",
+                          "fill": "#71717A",
+                          "content": "经典流行 · 18 首歌曲",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "ZH0sI",
+                      "name": "chevron4",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "#52525B"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "4khxT",
+          "name": "navBar2",
+          "width": "fill_container",
+          "height": 83,
+          "fill": "#09090B",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#27272A"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "padding": [
+            0,
+            0,
+            34,
+            0
+          ],
+          "justifyContent": "space_around",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "eopKF",
+              "name": "navItem21",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Qd2y1",
+                  "name": "navIcon21",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "book-open",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "6irog",
+                  "name": "navLabel21",
+                  "fill": "#71717A",
+                  "content": "谱库",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hBbXS",
+              "name": "navItem22",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "rSMoq",
+                  "name": "navIcon22",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "list-music",
+                  "iconFontFamily": "lucide",
+                  "fill": "#DC2626"
+                },
+                {
+                  "type": "text",
+                  "id": "rJR90",
+                  "name": "navLabel22",
+                  "fill": "#DC2626",
+                  "content": "歌单",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VKsi5",
+              "name": "navItem23",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "IAUk6",
+                  "name": "navIcon23",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "user",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "5n5ob",
+                  "name": "navLabel23",
+                  "fill": "#71717A",
+                  "content": "我的",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Fmnc5",
+      "x": 800,
+      "y": 0,
+      "name": "播放页面",
+      "width": 375,
+      "height": 812,
+      "fill": "#0A0A0A",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "A0EWJ",
+          "name": "topBar",
+          "width": "fill_container",
+          "height": 73,
+          "layout": "vertical",
+          "padding": [
+            50,
+            16,
+            12,
+            16
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "jw7Jd",
+              "name": "headerSimple",
+              "width": "fill_container",
+              "gap": 12,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "SM7jS",
+                  "name": "backArrow",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "chevron-left",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "MvCqI",
+                  "name": "titleSimple",
+                  "fill": "#FAFAFA",
+                  "content": "小情歌",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "CFRjj",
+                  "name": "keyTextSimple",
+                  "fill": "#71717A",
+                  "content": "C调",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "xiQTo",
+          "name": "chordSheetArea",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#18181B",
+          "cornerRadius": [
+            24,
+            24,
+            0,
+            0
+          ],
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            12,
+            16,
+            120,
+            16
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "AgS7T",
+              "name": "sectionLabel",
+              "fill": "#DC2626",
+              "content": "[前奏]",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "pamWy",
+              "name": "chordLine1",
+              "fill": "#EF4444",
+              "content": "C    G    Am   F",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 16,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "f6r55",
+              "name": "verseLabel",
+              "fill": "#DC2626",
+              "content": "[主歌]",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "uTspk",
+              "name": "lyricBlock1",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "FeHdn",
+                  "name": "chordRow1",
+                  "fill": "#EF4444",
+                  "content": "    C              G",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "TyHEW",
+                  "name": "lyricRow1",
+                  "fill": "#FAFAFA",
+                  "content": "就算大雨让这座城市颌倒",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "y1wfU",
+                  "name": "chordRow2",
+                  "fill": "#EF4444",
+                  "content": "    Am             F",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "ukFlF",
+                  "name": "lyricRow2",
+                  "fill": "#FAFAFA",
+                  "content": "我会给你怀抱",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "F8Ny9",
+              "name": "lyricBlock2",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "9g2tv",
+                  "name": "chordRow3",
+                  "fill": "#EF4444",
+                  "content": "    C              G",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "vVelw",
+                  "name": "lyricRow3",
+                  "fill": "#FAFAFA",
+                  "content": "只要有你的地方",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "q9a5O",
+                  "name": "chordRow4",
+                  "fill": "#EF4444",
+                  "content": "    Am             F",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "5TVXi",
+                  "name": "lyricRow4",
+                  "fill": "#FAFAFA",
+                  "content": "天气都变成晴朗",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "4XDQC",
+              "name": "chorusLabel",
+              "fill": "#DC2626",
+              "content": "[副歌]",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "JIujG",
+              "name": "lyricBlock3",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "tsK7b",
+                  "name": "chordRow5",
+                  "fill": "#EF4444",
+                  "content": "    F              C",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "dDNjD",
+                  "name": "lyricRow5",
+                  "fill": "#FAFAFA",
+                  "content": "就算不只是朋友",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "7SS6W",
+                  "name": "chordRow6",
+                  "fill": "#EF4444",
+                  "content": "    G              Am",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "sh0Ux",
+                  "name": "lyricRow6",
+                  "fill": "#FAFAFA",
+                  "content": "也只能这样的对待",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "53nOW",
+              "name": "lyricBlock4",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "A03FU",
+                  "name": "chordRow7",
+                  "fill": "#EF4444",
+                  "content": "    F              C",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "nQHqf",
+                  "name": "lyricRow7",
+                  "fill": "#FAFAFA",
+                  "content": "因为你总是提醒我",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "ypBs1",
+                  "name": "chordRow8",
+                  "fill": "#EF4444",
+                  "content": "    G              Am   F",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "EZRTK",
+                  "name": "lyricRow8",
+                  "fill": "#FAFAFA",
+                  "content": "我们的爱情   多么美丽",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "LTkHy",
+          "name": "controlBar",
+          "width": "fill_container",
+          "fill": "#18181B",
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16,
+            16,
+            34,
+            16
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "Dlcf7",
+              "name": "playbackControls",
+              "width": "fill_container",
+              "gap": 20,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "aPQZq",
+                  "name": "prevSection",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "5uVJs",
+                      "name": "prevButton",
+                      "width": 28,
+                      "height": 28,
+                      "iconFontName": "skip-back",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FAFAFA"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ClH6A",
+                      "name": "prevSongName",
+                      "fill": "#71717A",
+                      "content": "成都",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "CGBn8",
+                  "name": "playSection",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "w9GGf",
+                      "name": "playButton",
+                      "width": 56,
+                      "height": 56,
+                      "fill": "#DC2626",
+                      "cornerRadius": 32,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "4MzrZ",
+                          "name": "listIcon",
+                          "width": 28,
+                          "height": 28,
+                          "iconFontName": "list-music",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "0o39F",
+                      "name": "currentSongName",
+                      "fill": "#FAFAFA",
+                      "content": "2/60",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "fsjSa",
+                  "name": "nextSection",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "1rGzL",
+                      "name": "nextButton",
+                      "width": 28,
+                      "height": 28,
+                      "iconFontName": "skip-forward",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FAFAFA"
+                    },
+                    {
+                      "type": "text",
+                      "id": "i6Rqg",
+                      "name": "nextSongName",
+                      "fill": "#71717A",
+                      "content": "晚风",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "XILuY",
+      "x": 1200,
+      "y": 0,
+      "name": "我的页面",
+      "width": 375,
+      "height": 812,
+      "fill": "#0A0A0A",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "xOEFb",
+          "name": "profileHeader",
+          "width": "fill_container",
+          "fill": "#18181B",
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            60,
+            20,
+            20,
+            20
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "1f2IG",
+              "name": "avatar",
+              "width": 80,
+              "height": 80,
+              "fill": "#DC2626",
+              "cornerRadius": 40,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "2EsQv",
+                  "name": "avatarIcon",
+                  "width": 40,
+                  "height": 40,
+                  "iconFontName": "user",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "9pM7h",
+              "name": "usernameText",
+              "fill": "#FAFAFA",
+              "content": "吉他爱好者",
+              "fontFamily": "Inter",
+              "fontSize": 22,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "6sHSk",
+              "name": "pointsCard",
+              "width": "fill_container",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 135,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#DC2626",
+                    "position": 0
+                  },
+                  {
+                    "color": "#991B1B",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 16,
+              "padding": 16,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mGfmf",
+                  "name": "pointsInfo",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FrXO8",
+                      "name": "pointsLabel",
+                      "opacity": 0.8,
+                      "fill": "#FFFFFF",
+                      "content": "点数余额",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NUGTZ",
+                      "name": "pointsValue",
+                      "fill": "#FFFFFF",
+                      "content": "1,280",
+                      "fontFamily": "Inter",
+                      "fontSize": 32,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "L8kAc",
+                  "name": "rechargeButton",
+                  "fill": "#FAFAFA",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#FAFAFA"
+                  },
+                  "gap": 6,
+                  "padding": [
+                    8,
+                    20
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "rDBpY",
+                      "name": "rechargeIcon",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "circle-plus",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FF3B30"
+                    },
+                    {
+                      "type": "text",
+                      "id": "E8Wbm",
+                      "name": "rechargeText",
+                      "fill": "#FAFAFA",
+                      "content": "充值",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "EBbt1",
+          "name": "statsSection",
+          "width": "fill_container",
+          "fill": "#18181B",
+          "effect": {
+            "type": "background_blur",
+            "radius": 10
+          },
+          "padding": 20,
+          "justifyContent": "space_around",
+          "children": [
+            {
+              "type": "frame",
+              "id": "lgLOA",
+              "name": "stat1",
+              "layout": "vertical",
+              "gap": 6,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "s1SMf",
+                  "name": "stat1Value",
+                  "fill": "#FAFAFA",
+                  "content": "45",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "NNOjT",
+                  "name": "stat1Label",
+                  "fill": "#71717A",
+                  "content": "已收藏",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lseDC",
+              "name": "stat2",
+              "layout": "vertical",
+              "gap": 6,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "XgpuM",
+                  "name": "stat2Value",
+                  "fill": "#FAFAFA",
+                  "content": "8",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "Nlcsd",
+                  "name": "stat2Label",
+                  "fill": "#71717A",
+                  "content": "歌单",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "apMXL",
+              "name": "stat3",
+              "layout": "vertical",
+              "gap": 6,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "QY3yH",
+                  "name": "stat3Value",
+                  "fill": "#FAFAFA",
+                  "content": "120h",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "6ztwN",
+                  "name": "stat3Label",
+                  "fill": "#71717A",
+                  "content": "练习",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "OsXPO",
+          "name": "menuSection",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "uMbeW",
+              "name": "menuItem1",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#27272A"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 12,
+              "padding": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "1sB29",
+                  "name": "menuIcon1",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "music",
+                  "iconFontFamily": "lucide",
+                  "fill": "#DC2626"
+                },
+                {
+                  "type": "text",
+                  "id": "EyLA3",
+                  "name": "menuText1",
+                  "fill": "#FAFAFA",
+                  "content": "收藏的曲目",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "OGtz3",
+                  "name": "spacer1",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "icon_font",
+                  "id": "NiD7k",
+                  "name": "chevronMenu1",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "#C7C7CC"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pjoO6",
+              "name": "menuItem2",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#27272A"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 12,
+              "padding": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "VVzyq",
+                  "name": "menuIcon2",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "list",
+                  "iconFontFamily": "lucide",
+                  "fill": "#10B981"
+                },
+                {
+                  "type": "text",
+                  "id": "l5i6O",
+                  "name": "menuText2",
+                  "fill": "#FAFAFA",
+                  "content": "创建的歌单",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "FG6Od",
+                  "name": "spacer2",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "icon_font",
+                  "id": "OjK1z",
+                  "name": "chevronMenu2",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "#C7C7CC"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "95NyA",
+              "name": "menuItem3",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#27272A"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 12,
+              "padding": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Fvtnv",
+                  "name": "menuIcon3",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "download",
+                  "iconFontFamily": "lucide",
+                  "fill": "#F59E0B"
+                },
+                {
+                  "type": "text",
+                  "id": "03era",
+                  "name": "menuText3",
+                  "fill": "#FAFAFA",
+                  "content": "下载的曲谱",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "1vhU4",
+                  "name": "spacer3",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "icon_font",
+                  "id": "H5FdT",
+                  "name": "chevronMenu3",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "#C7C7CC"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "friPD",
+              "name": "menuItem4",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#27272A"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 12,
+              "padding": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "uPDpa",
+                  "name": "menuIcon4",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "history",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B5CF6"
+                },
+                {
+                  "type": "text",
+                  "id": "TW2tY",
+                  "name": "menuText4",
+                  "fill": "#FAFAFA",
+                  "content": "练习历史",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "6xWvv",
+                  "name": "spacer4",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "icon_font",
+                  "id": "blpWT",
+                  "name": "chevronMenu4",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "#C7C7CC"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "mfHdt",
+          "name": "settingsSection",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            20,
+            100,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "BDBkS",
+              "name": "settingsItem",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#27272A"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 12,
+              "padding": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "njLEA",
+                  "name": "settingsIcon",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "settings",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "LaNsc",
+                  "name": "settingsText",
+                  "fill": "#FAFAFA",
+                  "content": "设置",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "NQVgn",
+                  "name": "spacerSettings",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "icon_font",
+                  "id": "K2qjN",
+                  "name": "chevronSettings",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "#C7C7CC"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Np4uu",
+          "name": "navBar3",
+          "width": "fill_container",
+          "height": 83,
+          "fill": "#09090B",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#27272A"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "padding": [
+            0,
+            0,
+            34,
+            0
+          ],
+          "justifyContent": "space_around",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "gddEa",
+              "name": "navItem31",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Dcj0S",
+                  "name": "navIcon31",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "book-open",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "oxpT9",
+                  "name": "navLabel31",
+                  "fill": "#71717A",
+                  "content": "谱库",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "aLgQA",
+              "name": "navItem32",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "X8BQf",
+                  "name": "navIcon32",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "list-music",
+                  "iconFontFamily": "lucide",
+                  "fill": "#71717A"
+                },
+                {
+                  "type": "text",
+                  "id": "CROLn",
+                  "name": "navLabel32",
+                  "fill": "#71717A",
+                  "content": "歌单",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "S42OH",
+              "name": "navItem33",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Hwb6b",
+                  "name": "navIcon33",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "user",
+                  "iconFontFamily": "lucide",
+                  "fill": "#DC2626"
+                },
+                {
+                  "type": "text",
+                  "id": "Vj9un",
+                  "name": "navLabel33",
+                  "fill": "#DC2626",
+                  "content": "我的",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "EhSet",
+      "x": 1600,
+      "y": 0,
+      "name": "播放器+弹窗",
+      "width": 375,
+      "height": 812,
+      "fill": "#0A0A0A",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "hSJYJ",
+          "x": 0,
+          "y": 0,
+          "name": "playerBg",
+          "width": 375,
+          "height": 812,
+          "fill": "#0A0A0A",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "N7HPp",
+              "name": "topBar",
+              "width": "fill_container",
+              "height": 73,
+              "layout": "vertical",
+              "padding": [
+                50,
+                16,
+                12,
+                16
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "vvgV5",
+                  "name": "headerSimple",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "jrtrd",
+                      "name": "backArrow",
+                      "width": 24,
+                      "height": 24,
+                      "iconFontName": "chevron-left",
+                      "iconFontFamily": "lucide",
+                      "fill": "#71717A"
+                    },
+                    {
+                      "type": "text",
+                      "id": "O1eTM",
+                      "name": "titleSimple",
+                      "fill": "#FAFAFA",
+                      "content": "小情歌",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "vkit9",
+                      "name": "keyTextSimple",
+                      "fill": "#71717A",
+                      "content": "C调",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "IYJPP",
+              "name": "chordSheetArea",
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": "#18181B",
+              "cornerRadius": [
+                24,
+                24,
+                0,
+                0
+              ],
+              "effect": {
+                "type": "background_blur",
+                "radius": 20
+              },
+              "layout": "vertical",
+              "gap": 16,
+              "padding": [
+                12,
+                16,
+                120,
+                16
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pW041",
+                  "name": "sectionLabel",
+                  "fill": "#DC2626",
+                  "content": "[前奏]",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "MbJwj",
+                  "name": "chordLine1",
+                  "fill": "#EF4444",
+                  "content": "C    G    Am   F",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "xc7ly",
+                  "name": "verseLabel",
+                  "fill": "#DC2626",
+                  "content": "[主歌]",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "gK2Ju",
+                  "name": "lyricBlock1",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "EO9U0",
+                      "name": "chordRow1",
+                      "fill": "#EF4444",
+                      "content": "    C              G",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "sKsGd",
+                      "name": "lyricRow1",
+                      "fill": "#FAFAFA",
+                      "content": "就算大雨让这座城市颌倒",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "TrGhn",
+                      "name": "chordRow2",
+                      "fill": "#EF4444",
+                      "content": "    Am             F",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ymdgx",
+                      "name": "lyricRow2",
+                      "fill": "#FAFAFA",
+                      "content": "我会给你怀抱",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "KTkHz",
+                  "name": "lyricBlock2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "m1HaX",
+                      "name": "chordRow3",
+                      "fill": "#EF4444",
+                      "content": "    C              G",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "YLxxt",
+                      "name": "lyricRow3",
+                      "fill": "#FAFAFA",
+                      "content": "只要有你的地方",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "P5tKK",
+                      "name": "chordRow4",
+                      "fill": "#EF4444",
+                      "content": "    Am             F",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rwMgl",
+                      "name": "lyricRow4",
+                      "fill": "#FAFAFA",
+                      "content": "天气都变成晴朗",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "pz15b",
+                  "name": "chorusLabel",
+                  "fill": "#DC2626",
+                  "content": "[副歌]",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "gVjUN",
+                  "name": "lyricBlock3",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ucqiE",
+                      "name": "chordRow5",
+                      "fill": "#EF4444",
+                      "content": "    F              C",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "D2npb",
+                      "name": "lyricRow5",
+                      "fill": "#FAFAFA",
+                      "content": "就算不只是朋友",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "0QlLv",
+                      "name": "chordRow6",
+                      "fill": "#EF4444",
+                      "content": "    G              Am",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "pvxnD",
+                      "name": "lyricRow6",
+                      "fill": "#FAFAFA",
+                      "content": "也只能这样的对待",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "MdG2y",
+                  "name": "lyricBlock4",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "MRDFj",
+                      "name": "chordRow7",
+                      "fill": "#EF4444",
+                      "content": "    F              C",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "p3AcE",
+                      "name": "lyricRow7",
+                      "fill": "#FAFAFA",
+                      "content": "因为你总是提醒我",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "FECKq",
+                      "name": "chordRow8",
+                      "fill": "#EF4444",
+                      "content": "    G              Am   F",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "hMYKg",
+                      "name": "lyricRow8",
+                      "fill": "#FAFAFA",
+                      "content": "我们的爱情   多么美丽",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "SEmyc",
+              "name": "controlBar",
+              "width": "fill_container",
+              "fill": "#18181B",
+              "effect": {
+                "type": "background_blur",
+                "radius": 20
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": [
+                16,
+                16,
+                34,
+                16
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "6nST8",
+                  "name": "playbackControls",
+                  "width": "fill_container",
+                  "gap": 20,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "4I0xf",
+                      "name": "prevSection",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "2KD3X",
+                          "name": "prevButton",
+                          "width": 28,
+                          "height": 28,
+                          "iconFontName": "skip-back",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FAFAFA"
+                        },
+                        {
+                          "type": "text",
+                          "id": "TH79Z",
+                          "name": "prevSongName",
+                          "fill": "#71717A",
+                          "content": "成都",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "MBsNI",
+                      "name": "playSection",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Xbdc4",
+                          "name": "playButton",
+                          "width": 56,
+                          "height": 56,
+                          "fill": "#DC2626",
+                          "cornerRadius": 32,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "8tqeh",
+                              "name": "listIcon",
+                              "width": 28,
+                              "height": 28,
+                              "iconFontName": "list-music",
+                              "iconFontFamily": "lucide",
+                              "fill": "#FFFFFF"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "Tva3r",
+                          "name": "currentSongName",
+                          "fill": "#FAFAFA",
+                          "content": "2/60",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bry7B",
+                      "name": "nextSection",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "ttsgh",
+                          "name": "nextButton",
+                          "width": 28,
+                          "height": 28,
+                          "iconFontName": "skip-forward",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FAFAFA"
+                        },
+                        {
+                          "type": "text",
+                          "id": "lyBL1",
+                          "name": "nextSongName",
+                          "fill": "#71717A",
+                          "content": "晚风",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "2jEna",
+          "x": 0,
+          "y": 0,
+          "name": "drawerOverlay",
+          "width": 375,
+          "height": 812,
+          "fill": "#000000",
+          "layout": "vertical",
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "frame",
+              "id": "hoOQk",
+              "name": "drawerContent",
+              "width": "fill_container",
+              "height": 500,
+              "fill": "#18181B",
+              "cornerRadius": [
+                24,
+                24,
+                0,
+                0
+              ],
+              "effect": {
+                "type": "background_blur",
+                "radius": 30
+              },
+              "layout": "vertical",
+              "padding": [
+                20,
+                0,
+                34,
+                0
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "60DjE",
+                  "name": "drawerHandle",
+                  "width": 40,
+                  "height": 4,
+                  "fill": "#52525B",
+                  "cornerRadius": 2
+                },
+                {
+                  "type": "frame",
+                  "id": "doZ6L",
+                  "name": "drawerHeader",
+                  "width": "fill_container",
+                  "padding": [
+                    16,
+                    20,
+                    12,
+                    20
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "JHYY5",
+                      "name": "playlistTitle",
+                      "fill": "#FAFAFA",
+                      "content": "当前歌单",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "bIfhu",
+                      "name": "playlistCount",
+                      "fill": "#71717A",
+                      "content": "60 首",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "OpIZG",
+                  "name": "songList",
+                  "width": "fill_container",
+                  "height": 380,
+                  "layout": "vertical",
+                  "padding": [
+                    0,
+                    20
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "4t0En",
+                      "name": "song1",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        12,
+                        0
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ZAfFc",
+                          "name": "index1",
+                          "fill": "#52525B",
+                          "content": "01",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "K8M31",
+                          "name": "songInfo1",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "RF62B",
+                              "name": "songName1",
+                              "fill": "#FAFAFA",
+                              "content": "成都",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ZUeO6",
+                              "name": "artist1",
+                              "fill": "#71717A",
+                              "content": "赵雷 · C调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "YNfWL",
+                      "name": "song2",
+                      "width": "fill_container",
+                      "fill": "#DC2626",
+                      "cornerRadius": 12,
+                      "gap": 12,
+                      "padding": 12,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "2VvQO",
+                          "name": "index2",
+                          "fill": "#DC2626",
+                          "content": "02",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "tgY8A",
+                          "name": "songInfo2",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Ntv9c",
+                              "name": "songName2",
+                              "fill": "#FAFAFA",
+                              "content": "小情歌",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "UcKiP",
+                              "name": "artist2",
+                              "fill": "#A1A1AA",
+                              "content": "苏打绿 · C调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "hio0f",
+                          "name": "playingIcon",
+                          "width": 18,
+                          "height": 18,
+                          "iconFontName": "music",
+                          "iconFontFamily": "lucide",
+                          "fill": "#DC2626"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "XDVJE",
+                      "name": "song3",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        12,
+                        0
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "eDzkl",
+                          "name": "index3",
+                          "fill": "#52525B",
+                          "content": "03",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "YEkf7",
+                          "name": "songInfo3",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "7jEtl",
+                              "name": "songName3",
+                              "fill": "#FAFAFA",
+                              "content": "晚风",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "UZaKW",
+                              "name": "artist3",
+                              "fill": "#71717A",
+                              "content": "伍伯贤 · G调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "YNj1o",
+                      "name": "song4",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        12,
+                        0
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Z7e8P",
+                          "name": "index4",
+                          "fill": "#52525B",
+                          "content": "04",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Ls0g0",
+                          "name": "songInfo4",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "JCqy2",
+                              "name": "songName4",
+                              "fill": "#FAFAFA",
+                              "content": "理想三旬",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "TYXII",
+                              "name": "artist4",
+                              "fill": "#71717A",
+                              "content": "陈鸿宇 · C调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "u3EyT",
+                      "name": "song5",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        12,
+                        0
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "vo1UL",
+                          "name": "index5",
+                          "fill": "#52525B",
+                          "content": "05",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "MKoW8",
+                          "name": "songInfo5",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "xzPFU",
+                              "name": "songName5",
+                              "fill": "#FAFAFA",
+                              "content": "佛系少女",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "RikQM",
+                              "name": "artist5",
+                              "fill": "#71717A",
+                              "content": "冯提莫 · C调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "HNWWi",
+                      "name": "moreIndicator",
+                      "width": "fill_container",
+                      "padding": [
+                        16,
+                        0
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "gpGNr",
+                          "name": "moreText",
+                          "fill": "#52525B",
+                          "content": "还有55首...",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "03cdN",
+                      "name": "song6",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        12,
+                        0
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "gIzIY",
+                          "name": "index6",
+                          "fill": "#52525B",
+                          "content": "06",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "IeXkQ",
+                          "name": "songInfo6",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "KMoyz",
+                              "name": "songName6",
+                              "fill": "#FAFAFA",
+                              "content": "光年之外",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "cwW7k",
+                              "name": "artist6",
+                              "fill": "#71717A",
+                              "content": "郑秀文 · G调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ed8V0",
+                      "name": "song7",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        12,
+                        0
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "kfi9a",
+                          "name": "index7",
+                          "fill": "#52525B",
+                          "content": "07",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "HdMH4",
+                          "name": "songInfo7",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "CPBZH",
+                              "name": "songName7",
+                              "fill": "#FAFAFA",
+                              "content": "明天你好",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "olgcz",
+                              "name": "artist7",
+                              "fill": "#71717A",
+                              "content": "牛奶咖啡 · C调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jXA6j",
+                      "name": "song8",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        12,
+                        0
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "jwrSD",
+                          "name": "index8",
+                          "fill": "#52525B",
+                          "content": "08",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "C0glJ",
+                          "name": "songInfo8",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "iq6AB",
+                              "name": "songName8",
+                              "fill": "#FAFAFA",
+                              "content": "南山南",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "2Ze9b",
+                              "name": "artist8",
+                              "fill": "#71717A",
+                              "content": "马飞 · C调",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "XroAw",
+                  "name": "scrollHint",
+                  "width": "fill_container",
+                  "gap": 4,
+                  "padding": [
+                    8,
+                    0,
+                    0,
+                    0
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "AQU7H",
+                      "name": "scrollIcon",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "chevrons-up",
+                      "iconFontFamily": "lucide",
+                      "fill": "#52525B"
+                    },
+                    {
+                      "type": "text",
+                      "id": "qVmoE",
+                      "name": "scrollText",
+                      "fill": "#52525B",
+                      "content": "上滑查看更多 53 首",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "3Pve1",
+                  "name": "controlBarInDrawer",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": [
+                    12,
+                    16,
+                    0,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "PZ4c9",
+                      "name": "playbackRow",
+                      "width": "fill_container",
+                      "gap": 20,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "NbEjj",
+                          "name": "prevSectionDrawer",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "fyUMV",
+                              "name": "prevBtnDrawer",
+                              "width": 28,
+                              "height": 28,
+                              "iconFontName": "skip-back",
+                              "iconFontFamily": "lucide",
+                              "fill": "#FAFAFA"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ij77X",
+                              "name": "prevNameDrawer",
+                              "fill": "#71717A",
+                              "content": "成都",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ZDSud",
+                          "name": "listSectionDrawer",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "FxWPX",
+                              "name": "listBtnDrawer",
+                              "width": 56,
+                              "height": 56,
+                              "fill": "#DC2626",
+                              "cornerRadius": 28,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "3WJFL",
+                                  "name": "listIconDrawer",
+                                  "width": 28,
+                                  "height": 28,
+                                  "iconFontName": "list-music",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#FFFFFF"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "V4oLu",
+                              "name": "listCountDrawer",
+                              "fill": "#FAFAFA",
+                              "content": "2/60",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "6fdTz",
+                          "name": "nextSectionDrawer",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "yZOQS",
+                              "name": "nextBtnDrawer",
+                              "width": 28,
+                              "height": 28,
+                              "iconFontName": "skip-forward",
+                              "iconFontFamily": "lucide",
+                              "fill": "#FAFAFA"
+                            },
+                            {
+                              "type": "text",
+                              "id": "pl08W",
+                              "name": "nextNameDrawer",
+                              "fill": "#71717A",
+                              "content": "晚风",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
