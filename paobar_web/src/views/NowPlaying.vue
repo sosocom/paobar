@@ -274,7 +274,9 @@ const calcContentScale = () => {
     const naturalH = content.scrollHeight
 
     if (naturalH > 0 && naturalH < availH) {
-      contentScale.value = availH / naturalH
+      // 限制最大放大倍数，避免短谱被撑得过大（和弦名变形、丢失原版观感）
+      const MAX_SCALE = 1.35
+      contentScale.value = Math.min(availH / naturalH, MAX_SCALE)
     }
   })
 }
@@ -523,108 +525,284 @@ const addSongToPlaylist = async (plId: string) => {
   transform: translateY(100%);
 }
 
-/* 吉他谱HTML内容样式 */
+/* ================================================================= *
+ * 吉他谱渲染 —— 对齐 yopu.co 原版 xhe-sheet 布局
+ *   实际 HTML 结构（来自 SeleniumCrawler 保存）:
+ *     .sheet-container > .xhe-sheet
+ *       > .sheet-header  .title / .info .item{.label,.text} / .meta .col{.label,.value}
+ *       > .xhe-body
+ *           <xhe-headline><div text-value>段落名</div></xhe-headline>
+ *           <xhe-text>歌词...</xhe-text>
+ *           <xhe-chord-anchor data-chord="1">
+ *             <div class="chord">1<span class="chord-type">m</span></div>
+ *             <div class="text">字</div>
+ *           </xhe-chord-anchor>
+ *           <xhe-line-break><br></xhe-line-break>
+ *   主色覆盖原版 --color-accent，统一使用项目红色主调
+ * ================================================================= */
 .tab-content-html {
-  padding: 15px;
+  --accent: #ef4444;        /* 和弦主色（暗背景下比 #DC2626 更易读） */
+  --accent-soft: rgba(239, 68, 68, 0.14);
+  --meta-border: rgba(255, 255, 255, 0.14);
+  --headline-bg: rgba(255, 255, 255, 0.04);
+  --underline: rgba(255, 255, 255, 0.22);
+  --color-font-main: var(--text-primary, #fafafa);
+  --color-font-secondary: #d4d4d8;
+  --color-font-tertiary: #a1a1aa;
+
+  font-family: 'Hiragino Sans GB', 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+  font-size: 17px;
+  color: var(--color-font-main);
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+  padding: 22px 24px 48px;
+  max-width: 820px;
+}
+
+/* ---------- 外层容器 ---------- */
+.tab-content-html :deep(.sheet-container),
+.tab-content-html :deep(.xhe-sheet) {
+  position: relative;
+  padding: 0;
+  background: transparent;
+}
+
+/* ---------- sheet-header：标题 + 演唱 + meta 方块（参考 yopu 桌面布局） ---------- */
+.tab-content-html :deep(.sheet-header) {
+  position: relative;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--meta-border);
+}
+
+.tab-content-html :deep(.sheet-header .title) {
+  font-size: 1.7em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 4px 0 8px;
+  color: var(--color-font-main);
+  word-break: break-all;
+}
+
+.tab-content-html :deep(.sheet-header .info) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin-bottom: 10px;
+}
+
+.tab-content-html :deep(.sheet-header .info .item .label) {
+  margin-right: 6px;
+  font-size: 0.9em;
+  color: var(--accent);
+}
+
+.tab-content-html :deep(.sheet-header .info .item .text) {
+  color: var(--color-font-secondary);
+  font-size: 0.95em;
+}
+
+/* meta 方块（4 格：拍号 / 拍速 / 选调 / 原唱调）——
+   正常流，放在标题下方，一行 4 列，避免与标题重叠 */
+.tab-content-html :deep(.sheet-header .meta) {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 6px;
+  padding: 6px 4px;
+  border: 1px solid var(--meta-border);
   border-radius: 8px;
-  overflow-x: auto;
-  line-height: 1.6;
-  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
-/* ============================================ */
-/* 和弦显示样式 - 关键！ */
-/* ============================================ */
-
-/* 和弦容器 - 使用相对定位作为参考点 */
-.tab-content-html :deep(hexi-chord) {
-  position: relative !important;
-  display: inline !important;
-  vertical-align: baseline !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  overflow: visible !important;
-  font-size: 0 !important;
+.tab-content-html :deep(.sheet-header .meta .col) {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 2px 8px;
+  font-size: 0.85em;
+  line-height: 1.8em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* 和弦 SVG/Text - 绝对定位到文字上方 */
-.tab-content-html :deep(hexi-chord svg) {
-  position: absolute;
-  left: 50%;
-  bottom: 100%;
-  transform: translateX(-50%);
-  margin-bottom: 8px;
-  display: block;
-  z-index: 10;
-  font-size: 14px;
-  font-weight: bold;
-  color: #409eff;
+/* 列间竖向分隔线（第 2、3、4 列） */
+.tab-content-html :deep(.sheet-header .meta .col + .col) {
+  border-left: 1px solid var(--meta-border);
 }
 
-/* 和弦文字样式 */
-.tab-content-html :deep(hexi-chord svg text) {
-  fill: #409eff;
-  font-weight: bold;
-  font-size: 14px;
+.tab-content-html :deep(.sheet-header .meta .col .label) {
+  color: var(--color-font-tertiary);
 }
 
-/* 整体内容区域 */
+.tab-content-html :deep(.sheet-header .meta .col .value) {
+  color: var(--color-font-main);
+  font-weight: 500;
+}
+
+/* 窄屏：4 列改 2 列，保持每格一行内完整显示 */
+@media (max-width: 520px) {
+  .tab-content-html :deep(.sheet-header .title) {
+    font-size: 1.4em;
+  }
+  .tab-content-html :deep(.sheet-header .meta) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tab-content-html :deep(.sheet-header .meta .col + .col) {
+    border-left: none;
+  }
+  .tab-content-html :deep(.sheet-header .meta .col:nth-child(odd)) {
+    border-right: 1px solid var(--meta-border);
+  }
+  .tab-content-html :deep(.sheet-header .meta .col:nth-child(-n+2)) {
+    border-bottom: 1px solid var(--meta-border);
+  }
+}
+
+/* 如果谱体没有 sheet-header（老数据），我们自己的 xhe-header 占位继续生效 */
+.tab-content-html :deep(.xhe-header) {
+  display: none;
+}
+
+/* ---------- xhe-body 正文 ---------- */
 .tab-content-html :deep(.xhe-body) {
   position: relative;
-  line-height: 2.5;
-  padding-top: 0;
+  padding: 32px 0 0;   /* 顶部给第一行的和弦文本留出空间 */
 }
 
-/* 每一行内容 */
-.tab-content-html :deep(xhe-headline),
-.tab-content-html :deep(xhe-line) {
-  position: relative;
+/* 段落标题（主歌 / 副歌 / Bridge 等） */
+.tab-content-html :deep(xhe-headline) {
   display: block;
-  line-height: 2.5;
-  margin: 0;
-  padding: 0;
+  position: relative;
+  margin: 1.4em -0.5em 0.7em;
+  padding: 0.3em 0.7em;
+  background-color: var(--headline-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
 }
 
-/* 歌词文本正常显示 */
-.tab-content-html :deep(.text) {
+.tab-content-html :deep(xhe-headline [text-value]) {
   display: inline-block;
+  line-height: 1.7em;
+  font-size: 1em;
+  color: var(--color-font-secondary);
+  letter-spacing: 0.15em;
+}
+
+/* 第一个 headline 不要顶端 margin（避免与 xhe-body 内边距叠加） */
+.tab-content-html :deep(.xhe-body > xhe-headline:first-child) {
+  margin-top: 0;
+}
+
+/* ---------- 歌词行 ---------- */
+.tab-content-html :deep(xhe-text) {
+  display: inline;
+  line-height: 3.5em;          /* 关键：预留和弦上方空间 */
+  color: var(--color-font-main);
+  letter-spacing: 0.07em;
+}
+
+/* xhe-line-break 内部有 <br>，让整个元素占一行强制换行 */
+.tab-content-html :deep(xhe-line-break) {
+  display: inline;
+}
+
+/* ---------- 和弦锚点 ---------- */
+.tab-content-html :deep(xhe-chord-anchor) {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 0;
+  color: var(--color-font-main);
+  letter-spacing: 0.07em;
   vertical-align: baseline;
 }
 
-/* 和弦后面紧跟的空 text div - 不占空间 */
-.tab-content-html :deep(xhe-chord-anchor .text[text-value=""]) {
-  display: inline !important;
-  width: 0 !important;
-  margin: 0 -4px 0 0;
-  padding: 0 !important;
+.tab-content-html :deep(xhe-chord-anchor[data-value-length="0"]) {
+  min-width: 1em;
+  margin-right: 0.15em;
 }
 
-/* xhe-chord-anchor 容器也不占空间 */
-.tab-content-html :deep(xhe-chord-anchor) {
-  display: inline !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* ============================================ */
-/* 通用样式 */
-/* ============================================ */
-
-.tab-content-html :deep(h1),
-.tab-content-html :deep(h2),
-.tab-content-html :deep(h3),
-.tab-content-html :deep(h4) {
-  color: var(--primary);
-  margin: 1rem 0 0.5rem 0;
+/* 和弦文字（数字谱：1 / 6m / 5 / 2m，字母谱：Am / C / G7） */
+.tab-content-html :deep(xhe-chord-anchor > .chord) {
+  position: absolute;
+  top: -1.4em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Arial, 'Helvetica Neue', sans-serif;
+  color: var(--accent);
   font-weight: 600;
+  font-size: 0.95em;
+  letter-spacing: 0;
+  white-space: nowrap;
+  user-select: none;
+  line-height: 1;
+  transition: background-color 1s;
 }
 
-.tab-content-html :deep(p) {
-  margin: 0.5rem 0;
+.tab-content-html :deep(xhe-chord-anchor > .chord .chord-type) {
+  font-size: 0.8em;
+}
+
+/* 按住锚点时高亮（桌面端鼠标、移动端触摸） */
+.tab-content-html :deep(xhe-chord-anchor:active > .chord) {
+  background-color: var(--accent-soft);
+  border-radius: 3px;
+  transition: background-color 0s;
+}
+
+/* 歌词字下方的细下划线（标记和弦对应字） */
+.tab-content-html :deep(xhe-chord-anchor > .text) {
+  display: inline-block;
+  line-height: 1em;
+  text-align: center;
+  border-bottom: 0.07em solid var(--underline);
+  padding: 0.07em 0 0.21em;
+}
+
+/* ---------- 字母谱可能出现的 hexi-chord 指法图（为将来扩展保留） ---------- */
+.tab-content-html :deep(xhe-chord-anchor hexi-chord) {
+  position: absolute;
+  top: -3.2em;
+  color: var(--accent);
+  user-select: none;
+  line-height: 1;
+}
+
+.tab-content-html :deep(xhe-chord-anchor hexi-chord[instrument="guitar"]) {
+  left: -1em;
+}
+
+.tab-content-html :deep(hexi-chord svg) {
+  display: block;
+  overflow: visible;
+}
+
+.tab-content-html :deep(hexi-chord svg text),
+.tab-content-html :deep(hexi-chord svg *[fill]) {
+  fill: currentColor;
+}
+
+/* 选区高亮 */
+.tab-content-html :deep(xhe-chord-anchor [text-value]::selection),
+.tab-content-html :deep(xhe-headline::selection),
+.tab-content-html :deep(xhe-text::selection) {
+  background-color: var(--accent-soft);
+}
+
+/* ---------- 兜底：残留标签 ---------- */
+.tab-content-html :deep(a) {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.tab-content-html :deep(pre),
+.tab-content-html :deep(code) {
+  font-family: 'Courier New', monospace;
+  color: var(--accent);
 }
 
 .tab-content-html :deep(pre) {
@@ -632,76 +810,9 @@ const addSongToPlaylist = async (plId: string) => {
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
-  font-family: 'Courier New', monospace;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--primary);
   margin: 0;
   white-space: pre-wrap;
-}
-
-.tab-content-html :deep(code) {
-  font-family: 'Courier New', monospace;
-  color: var(--primary);
-}
-
-.tab-content-html :deep(a) {
-  color: var(--primary);
-  text-decoration: underline;
-}
-
-/* 确保包含和弦的段落有足够空间 */
-.tab-content-html :deep(.xhe-sheet) {
-  padding: 10px;
-  font-size: 16px;
-}
-
-.tab-content-html :deep(.xhe-header) {
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.tab-content-html :deep(.xhe-title) {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  text-align: center;
-  color: var(--text-primary);
-}
-
-.tab-content-html :deep(.xhe-info) {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 6px;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.tab-content-html :deep(.xhe-meta) {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
-.tab-content-html :deep(table) {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-}
-
-.tab-content-html :deep(th),
-.tab-content-html :deep(td) {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.5rem;
-  text-align: left;
-}
-
-.tab-content-html :deep(th) {
-  background: rgba(255, 255, 255, 0.05);
-  font-weight: 600;
 }
 </style>
