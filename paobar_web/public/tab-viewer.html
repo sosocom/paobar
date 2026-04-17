@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吉他谱渲染器</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .tab-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tab-image {
+            width: 100%;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="tab-container">
+        <div id="tab-content"></div>
+    </div>
+
+    <script>
+        // 从 URL 参数获取吉他谱数据
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataModel = urlParams.get('data');
+        const originalUrl = urlParams.get('url');
+        
+        if (dataModel) {
+            // 如果有 data-model 数据，尝试渲染
+            const container = document.getElementById('tab-content');
+            container.innerHTML = `
+                <div id="c" data-model="${dataModel}"></div>
+                <p style="color: #666; margin-top: 20px;">
+                    需要加载 yopu.co 的渲染库才能显示完整吉他谱。
+                    <a href="${originalUrl}" target="_blank">查看原页面</a>
+                </p>
+            `;
+        } else if (originalUrl) {
+            // 如果没有 data-model，显示 iframe
+            const container = document.getElementById('tab-content');
+            container.innerHTML = `
+                <iframe 
+                    src="${originalUrl}" 
+                    style="width: 100%; height: 1200px; border: none;"
+                    sandbox="allow-scripts allow-same-origin">
+                </iframe>
+            `;
+        }
+    </script>
+</body>
+</html>
