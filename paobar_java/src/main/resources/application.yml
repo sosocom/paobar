@@ -6,7 +6,7 @@ spring:
     name: guitar-tab-system
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://sosocomdb.mysql.rds.aliyuncs.com/guitar_tab?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://sosocomdb.mysql.rds.aliyuncs.com/paobar?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: rooter
     password: DbRooterPass123
   jackson:

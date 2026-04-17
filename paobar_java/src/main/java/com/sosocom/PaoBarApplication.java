@@ -16,7 +16,7 @@ public class PaoBarApplication {
     public static void main(String[] args) {
         SpringApplication.run(PaoBarApplication.class, args);
         System.out.println("=================================");
-        System.out.println("吉他谱管理系统启动成功！");
+        System.out.println("泡吧吉他谱-启动成功！");
         System.out.println("API地址: http://localhost:8001");
         System.out.println("=================================");
     }
