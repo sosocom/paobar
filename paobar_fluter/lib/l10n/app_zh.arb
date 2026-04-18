@@ -1,0 +1,21 @@
+{
+  "@@locale": "zh",
+  "appTitle": "泡吧吉他谱",
+  "navIndex": "谱库",
+  "navPlaylists": "歌单",
+  "navFavorites": "收藏",
+  "navProfile": "我的",
+  "loginTitle": "登录",
+  "username": "用户名",
+  "password": "密码",
+  "login": "登录",
+  "register": "注册",
+  "cancel": "取消",
+  "confirm": "确认",
+  "retry": "重试",
+  "loading": "加载中",
+  "emptyData": "暂无数据",
+  "networkError": "网络错误，请稍后重试",
+  "unauthorized": "登录已过期，请重新登录",
+  "searchHint": "搜索歌曲或歌手"
+}

@@ -1,0 +1,21 @@
+{
+  "@@locale": "en",
+  "appTitle": "PaoBar Tabs",
+  "navIndex": "Library",
+  "navPlaylists": "Playlists",
+  "navFavorites": "Favorites",
+  "navProfile": "Profile",
+  "loginTitle": "Sign in",
+  "username": "Username",
+  "password": "Password",
+  "login": "Sign in",
+  "register": "Sign up",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "retry": "Retry",
+  "loading": "Loading",
+  "emptyData": "No data",
+  "networkError": "Network error, please retry",
+  "unauthorized": "Session expired, please sign in again",
+  "searchHint": "Search songs or artists"
+}

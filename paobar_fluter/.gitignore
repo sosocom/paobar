@@ -1,0 +1,53 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/.fvm/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# System
+.DS_Store
+Thumbs.db
+
+# Generated (can be regenerated via build_runner)
+*.g.dart
+*.freezed.dart
+*.config.dart
+lib/l10n_gen/
+
+# Platform runners（由 flutter create . 生成，不纳入版本库的编译产物）
+android/.gradle/
+android/app/build/
+android/local.properties
+android/key.properties
+ios/Pods/
+ios/Podfile.lock
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+macos/Pods/
+macos/Podfile.lock
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+web/.dart_tool/
+
+# Env
+.env
+.env.local
+*.keystore
+*.jks
+
+# Coverage
+coverage/
+test/.test_coverage.dart
