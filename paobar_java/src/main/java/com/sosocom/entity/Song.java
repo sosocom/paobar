@@ -16,13 +16,17 @@ public class Song {
 
     private String songName;
 
+    /** 歌名拼音排序键（全拼小写），列表分页按此字段排序。 */
+    private String sortKey;
+
     private String artist;
 
     private String originalUrl;
 
     private String lyrics;
 
-    private String tabContent; // 吉他谱HTML内容
+    /** 规范化吉他谱 JSON 字符串（对应表字段 tab_content_json）。 */
+    private String tabContentJson;
 
     private String tabImageUrl;
 
@@ -45,9 +49,6 @@ public class Song {
     private Integer favoriteCount;
 
     private Integer status;
-
-    @TableLogic
-    private Integer deleted;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

@@ -1,46 +1,68 @@
 <template>
-  <!-- 固定高度：留出底部导航 5rem，这样内部列表区域才会真正滚动并触发加载更多 -->
-  <div class="flex flex-col overflow-hidden pb-20" style="height: calc(100vh - 5rem);">
-    <!-- Header -->
-    <header class="flex-shrink-0 z-40 bg-background-card/95 backdrop-blur-xl px-4 py-4">
-      <h1 class="text-2xl font-semibold mb-4 text-center">首页</h1>
-      
+  <!-- 固定高度：留出底部导航 + iOS safe-area，这样内部列表区域才会真正滚动并触发加载更多。
+       .h-screen-no-nav / --nav-height 统一在 style.css 里定义。 -->
+  <div class="flex flex-col overflow-hidden h-screen-no-nav">
+    <!-- Header：移除顶部标题，直接以搜索栏作为主入口，腾出更多主内容空间 -->
+    <header class="flex-shrink-0 z-40 bg-background-card/95 backdrop-blur-xl px-4 pt-3 pb-2">
       <!-- Search Bar -->
-      <div class="relative mb-4">
+      <div class="relative mb-3">
         <Search class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" :size="20" />
         <input 
           v-model="searchQuery"
           type="text" 
           placeholder="搜索歌曲、歌手"
-          class="w-full bg-background-overlay/50 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          class="w-full bg-background-overlay/50 rounded-xl pl-11 pr-11 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
+        <button
+          v-show="searchQuery.length > 0"
+          type="button"
+          class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-text-secondary hover:text-text-primary hover:bg-background-overlay/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+          aria-label="清空搜索"
+          @click="searchQuery = ''"
+        >
+          <X :size="18" />
+        </button>
       </div>
       
-      <!-- Filter Tags -->
-      <div class="flex gap-2 overflow-x-auto pb-2">
-        <button 
-          v-for="tag in filterTags" 
-          :key="tag"
-          @click="selectedTag = tag"
-          class="px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all"
-          :class="selectedTag === tag 
-            ? 'bg-primary text-white' 
-            : 'bg-background-overlay/50 text-text-secondary hover:bg-background-overlay'"
+      <!-- Filter Tags + 右侧"安装 App"入口：
+           左半是可横向滚动的筛选区，右半是固定宽度的 App 入口按钮。
+           已经 standalone 运行（已安装的 PWA）时隐藏入口，避免在 App 里再看到"装 App"。 -->
+      <div class="flex items-center gap-2 pb-2">
+        <div class="flex-1 min-w-0 flex gap-2 overflow-x-auto">
+          <button
+            v-for="tag in filterTags"
+            :key="tag"
+            @click="selectedTag = tag"
+            class="px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all"
+            :class="selectedTag === tag
+              ? 'bg-primary text-white'
+              : 'bg-background-overlay/50 text-text-secondary hover:bg-background-overlay'"
+          >
+            {{ tag }}
+          </button>
+        </div>
+        <button
+          v-if="shouldShowInstallEntry"
+          @click="openInstallWizard"
+          class="flex items-center gap-1 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap bg-primary/15 text-primary hover:bg-primary/25 transition-colors flex-shrink-0"
+          aria-label="安装为 App"
         >
-          {{ tag }}
+          <Download :size="14" />
+          <span>App</span>
         </button>
       </div>
     </header>
 
-    <!-- Song List Container: 可滚动区域，下拉刷新 + 上拉加载更多 -->
-    <div 
-      ref="scrollContainer"
-      class="flex-1 min-h-0 px-4 py-4 space-y-3 overflow-y-auto overscroll-contain"
-      @scroll="handleScroll"
-      @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
-      @touchend="handleTouchEnd"
-    >
+    <!-- 列表区：左侧可滚动列表 + 右侧通讯录式字母索引 -->
+    <div class="flex flex-1 min-h-0 min-w-0 relative">
+      <div 
+        ref="scrollContainer"
+        class="flex-1 min-w-0 pl-4 pr-0 py-3 overflow-y-auto overscroll-contain"
+        @scroll="handleScroll"
+        @touchstart="handleTouchStart"
+        @touchmove="handleTouchMove"
+        @touchend="handleTouchEnd"
+      >
       <!-- Pull-to-Refresh Indicator -->
       <div 
         v-if="pullDistance > 0" 
@@ -59,60 +81,59 @@
         <p class="text-text-secondary text-sm mt-3">加载中...</p>
       </div>
       
-      <!-- Song Cards -->
-      <div 
-        v-for="song in songs" 
-        :key="song.id"
-        class="bg-background-card/50 backdrop-blur-sm rounded-2xl p-3 flex gap-3 hover:bg-background-card/70 transition-all relative"
-      >
-        <!-- Main Song Info - Clickable -->
-        <div 
-          @click="playSong(song)"
-          class="flex gap-3 flex-1 min-w-0 cursor-pointer"
+      <!-- Song Cards（扁平列表；首字母筛选由后端按 indexLetter 过滤） -->
+      <div class="space-y-2 mb-3">
+        <div
+          v-for="song in displaySongs"
+          :key="song.id"
+          class="bg-background-card/50 backdrop-blur-sm rounded-xl p-2.5 flex gap-2.5 hover:bg-background-card/70 transition-all relative"
         >
-          <!-- Cover / Icon -->
-          <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-primary/10 flex items-center justify-center">
-            <Play :size="32" class="text-primary" />
-          </div>
-          
-          <!-- Info -->
-          <div class="flex-1 min-w-0">
-            <h3 class="font-medium truncate mb-1">{{ song.title }}</h3>
-            <p class="text-sm text-text-secondary truncate mb-2">{{ song.artist }}</p>
-            
-            <!-- Meta 信息 -->
-            <p v-if="song.meta" class="text-xs text-text-secondary truncate mb-2">{{ song.meta }}</p>
-            
-            <div class="flex items-center gap-3 text-xs text-text-secondary">
-              <span v-if="song.difficulty" class="px-2 py-0.5 bg-background-overlay/50 rounded">{{ song.difficulty }}</span>
-              <span v-if="song.playKey" class="px-2 py-0.5 bg-background-overlay/50 rounded">{{ song.playKey }}调</span>
-              <span v-if="song.originalKey" class="text-text-secondary">原调: {{ song.originalKey }}</span>
+          <!-- Main Song Info - Clickable -->
+          <div
+            @click="playSong(song)"
+            class="flex gap-2.5 flex-1 min-w-0 cursor-pointer"
+          >
+            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-primary/10 flex items-center justify-center">
+              <Play :size="24" class="text-primary" />
+            </div>
+
+            <div class="flex-1 min-w-0 flex flex-col justify-center">
+              <h3 class="font-medium truncate leading-tight">{{ song.title }}</h3>
+              <p class="text-xs text-text-secondary truncate mt-0.5">{{ song.artist }}</p>
+
+              <p v-if="song.meta" class="text-[11px] text-text-secondary truncate mt-1">{{ song.meta }}</p>
+
+              <div
+                v-if="song.difficulty || song.playKey || song.originalKey"
+                class="flex items-center gap-1.5 text-[11px] text-text-secondary mt-1"
+              >
+                <span v-if="song.difficulty" class="px-1.5 py-0.5 bg-background-overlay/50 rounded">{{ song.difficulty }}</span>
+                <span v-if="song.playKey" class="px-1.5 py-0.5 bg-background-overlay/50 rounded">{{ song.playKey }}调</span>
+                <span v-if="song.originalKey">原调: {{ song.originalKey }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="flex flex-col items-center justify-center gap-2">
-          <!-- Favorite -->
-          <button
-            @click.stop="toggleFavorite(song)"
-            class="p-1.5 rounded-lg transition-colors"
-            :disabled="togglingFavId === song.id"
-          >
-            <Heart
-              :size="18"
-              :class="favoriteIds.has(song.id)
-                ? 'text-red-400 fill-red-400'
-                : 'text-text-secondary'"
-            />
-          </button>
-          <!-- Add to Playlist -->
-          <button
-            @click.stop="openAddToPlaylistDialog(song)"
-            class="p-1.5 rounded-lg transition-colors"
-          >
-            <Plus :size="18" class="text-text-secondary" />
-          </button>
+
+          <div class="flex flex-col items-center justify-center gap-1 flex-shrink-0">
+            <button
+              @click.stop="toggleFavorite(song)"
+              class="p-1 rounded-lg transition-colors"
+              :disabled="togglingFavId === song.id"
+            >
+              <Heart
+                :size="16"
+                :class="favoriteIds.has(song.id)
+                  ? 'text-red-400 fill-red-400'
+                  : 'text-text-secondary'"
+              />
+            </button>
+            <button
+              @click.stop="openAddToPlaylistDialog(song)"
+              class="p-1 rounded-lg transition-colors"
+            >
+              <Plus :size="16" class="text-text-secondary" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -131,6 +152,39 @@
       <div v-if="!loading && songs.length === 0" class="text-center py-12">
         <p class="text-text-secondary">暂无歌曲</p>
       </div>
+      </div>
+
+      <!-- 右侧首字母快选：点击触发筛选；A 上方为清空选中按钮 -->
+      <nav
+        class="w-7 flex-shrink-0 self-stretch max-h-full overflow-y-auto flex flex-col items-stretch justify-start gap-0.5 py-3 px-0.5 border-l border-white/5 bg-background-card/50 backdrop-blur-sm"
+        aria-label="按首字母筛选"
+      >
+        <button
+          type="button"
+          @click="clearLetter"
+          class="text-[10px] leading-tight py-0.5 rounded text-center font-medium transition-colors"
+          :class="selectedIndexLetter === null
+            ? 'text-text-secondary/60 cursor-default'
+            : 'text-primary hover:bg-primary/10'"
+          :disabled="selectedIndexLetter === null"
+          aria-label="清空首字母筛选"
+          title="清空筛选"
+        >
+          <X :size="12" class="inline-block" />
+        </button>
+        <button
+          v-for="ch in indexLetters"
+          :key="ch"
+          type="button"
+          @click="selectLetter(ch)"
+          class="text-[10px] leading-tight py-0.5 rounded text-center font-medium transition-colors"
+          :class="selectedIndexLetter === ch
+            ? 'bg-primary text-white'
+            : 'text-primary/80 hover:text-primary hover:bg-primary/10'"
+        >
+          {{ ch }}
+        </button>
+      </nav>
     </div>
 
     <!-- Add to Playlist Dialog -->
@@ -191,27 +245,71 @@
   </div>
 </template>
 
+<script lang="ts">
+/**
+ * Index 页面会话级缓存（真·模块级，跨 setup 调用常驻）。
+ *
+ * 关键：必须放在没有 setup 修饰的 <script> 块里 —— `<script setup>` 整段会被
+ * 编译进 setup() 函数体，里面的 `let` 是按实例创建的，不是模块级，根本起不到
+ * 缓存作用。这就是上一版"看起来写了但没生效"的根因。
+ */
+import type { Song } from '@/types'
+
+export interface IndexCache {
+  searchQuery: string
+  selectedTag: string
+  selectedIndexLetter: string | null
+  songs: Song[]
+  currentPage: number
+  hasMore: boolean
+  scrollTop: number
+  savedAt: number
+}
+
+export const INDEX_CACHE_TTL_MS = 30 * 60 * 1000
+
+/** 跨实例的缓存槽。`<script>`（无 setup）只在模块装载时执行一次。 */
+export let indexCacheSlot: IndexCache | null = null
+
+export const setIndexCache = (c: IndexCache | null) => {
+  indexCacheSlot = c
+}
+
+export const readFreshIndexCache = (): IndexCache | null => {
+  if (!indexCacheSlot) return null
+  if (Date.now() - indexCacheSlot.savedAt >= INDEX_CACHE_TTL_MS) return null
+  return indexCacheSlot
+}
+</script>
+
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { Search, Play, Heart, Plus, ListMusic } from 'lucide-vue-next'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
+import { Search, Play, Heart, Plus, ListMusic, Download, X } from 'lucide-vue-next'
 import { api } from '@/api'
 import { isLoggedIn } from '@/auth'
 import { requireLogin } from '@/authBus'
+import { openInstallWizard, shouldShowInstallEntry } from '@/installBus'
 import type { Song, Playlist } from '@/types'
+import {
+  compareSongsByTitlePinyin,
+  songIndexLetter,
+} from '@/utils/songIndex'
+
+const restored = readFreshIndexCache()
 
 const router = useRouter()
-const searchQuery = ref('')
-const selectedTag = ref('全部')
-const songs = ref<Song[]>([])
+const searchQuery = ref(restored?.searchQuery ?? '')
+const selectedTag = ref(restored?.selectedTag ?? '全部')
+const songs = ref<Song[]>(restored?.songs ?? [])
 const loading = ref(false)
 const loadingMore = ref(false)
 const isRefreshing = ref(false)
 
 // 分页相关
-const currentPage = ref(1)
+const currentPage = ref(restored?.currentPage ?? 1)
 const pageSize = 20
-const hasMore = ref(true)
+const hasMore = ref(restored?.hasMore ?? true)
 
 // 下拉刷新相关
 const scrollContainer = ref<HTMLElement | null>(null)
@@ -231,6 +329,45 @@ const favoriteIds = ref<Set<string>>(new Set())
 const togglingFavId = ref<string | null>(null)
 
 const filterTags = ['全部', '已收藏']
+
+/** 当前选中的首字母筛选；null 表示未选中（显示全部） */
+const selectedIndexLetter = ref<string | null>(restored?.selectedIndexLetter ?? null)
+
+/** 右侧字母索引固定为 A–Z + #，无论列表是否有对应字母 */
+const indexLetters = computed<string[]>(() => {
+  const az = Array.from({ length: 26 }, (_, i) =>
+    String.fromCharCode('A'.charCodeAt(0) + i),
+  )
+  return [...az, '#']
+})
+
+/**
+ * 实际渲染的列表：
+ * - 「全部」：后端按 indexLetter 已过滤好，直接展示
+ * - 「已收藏」：暂不分页，整体拉回后本地按拼音排序，并按选中的字母筛选
+ */
+const displaySongs = computed<Song[]>(() => {
+  if (selectedTag.value !== '已收藏') return songs.value
+  const sorted = [...songs.value].sort(compareSongsByTitlePinyin)
+  if (!selectedIndexLetter.value) return sorted
+  return sorted.filter((s) => songIndexLetter(s.title) === selectedIndexLetter.value)
+})
+
+function selectLetter(letter: string) {
+  if (selectedIndexLetter.value === letter) return
+  selectedIndexLetter.value = letter
+  scrollToTop()
+}
+
+function clearLetter() {
+  if (selectedIndexLetter.value === null) return
+  selectedIndexLetter.value = null
+  scrollToTop()
+}
+
+function scrollToTop() {
+  scrollContainer.value?.scrollTo({ top: 0, behavior: 'smooth' })
+}
 
 // 加载收藏ID列表
 const loadFavoriteIds = async () => {
@@ -284,11 +421,12 @@ const loadSongs = async (page: number = 1, append: boolean = false) => {
       }
       hasMore.value = false
     } else {
-      // 加载所有歌曲，支持搜索和分页
+      // 加载所有歌曲，支持搜索、分页与首字母筛选
       const params = {
         search: searchQuery.value,
         page: page,
-        pageSize: pageSize
+        pageSize: pageSize,
+        indexLetter: selectedIndexLetter.value,
       }
       console.log('[loadSongs] 发起请求', params)
       const newSongs = await api.getSongs(params)
@@ -448,17 +586,43 @@ const closeAddDialog = () => {
   addSuccess.value = ''
 }
 
-// 监听筛选条件变化
-watch([selectedTag, searchQuery], () => {
+// 监听筛选条件变化（标签 / 搜索词 / 首字母）
+watch([selectedTag, searchQuery, selectedIndexLetter], () => {
   currentPage.value = 1
   hasMore.value = true
   loadSongs(1, false)
 })
 
 // 初始化加载
-onMounted(() => {
-  loadSongs()
-  loadFavoriteIds()
+onMounted(async () => {
+  if (restored) {
+    // 命中缓存：跳过整体重拉，直接把滚动位置恢复到原处。
+    // 收藏状态可能在详情页被切换过，需要单独刷新一份用于红心高亮。
+    await nextTick()
+    if (scrollContainer.value) {
+      scrollContainer.value.scrollTop = restored.scrollTop
+    }
+    loadFavoriteIds()
+  } else {
+    loadSongs()
+    loadFavoriteIds()
+  }
+})
+
+// 离开首页（去 NowPlaying / Profile / Playlist…）前快照当前会话状态，
+// 再回来时由 onMounted 走 restored 分支恢复。
+onBeforeRouteLeave(() => {
+  const snapshot: IndexCache = {
+    searchQuery: searchQuery.value,
+    selectedTag: selectedTag.value,
+    selectedIndexLetter: selectedIndexLetter.value,
+    songs: songs.value,
+    currentPage: currentPage.value,
+    hasMore: hasMore.value,
+    scrollTop: scrollContainer.value?.scrollTop ?? 0,
+    savedAt: Date.now(),
+  }
+  setIndexCache(snapshot)
 })
 
 const playSong = (song: Song) => {

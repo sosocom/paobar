@@ -12,6 +12,10 @@ spring:
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
+  task:
+    scheduling:
+      pool:
+        size: 1
 
 mybatis-plus:
   configuration:
@@ -34,6 +38,17 @@ jwt:
 crawler:
   user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
   timeout: 30000
-  retry-times: 3
+  retry-times: 3   # 同一待爬任务-url 连续失败达此次数则 DELETE 移出队列（之前每次失败会回 PENDING）
   use-selenium: true    # 是否使用 Selenium（动态渲染）
   headless: true        # Selenium 无头模式
+  # 有谱账号谱列表：https://yopu.co/api/user/sheets （官方前端只传 code/sortBy/page/instrument）。
+  # 实测（2026-05）：服务端固定每页 10 条，附带 limit/pageSize 等仍为 10 条；
+  # 完整 URL 列表仍可靠 page++ 直到空数组。下面两项只做「你愿意试的参数」拼接，
+  # 若抓包到正确分页参数名可自行改。
+  account-sheets-page-size: 100   # >0 时附加 &limit=N&pageSize=N（可被服务端忽略）
+  yopu-user-sheets-extra-query: ''  # 追加片段，示例：take=50（不要开头的 &）
+  # 待爬队列（crawler_task PENDING）：定时分批消费
+  queue-batch-size: 5
+  queue-fixed-delay-ms: 60000
+  queue-initial-delay-ms: 15000
+  queue-task-interval-ms: 800

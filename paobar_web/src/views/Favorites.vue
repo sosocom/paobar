@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col overflow-hidden" style="height: 100vh;">
+  <!-- 扣掉 iOS 状态栏高度：#app 已经 padding-top 了 --status-height，
+       这里再用 100vh 就会超出屏幕底部 --status-height。 -->
+  <div class="flex flex-col overflow-hidden" style="height: calc(100dvh - var(--status-height));">
     <!-- Header -->
     <header class="flex-shrink-0 bg-background-card/95 backdrop-blur-xl px-4 py-4">
       <div class="flex items-center relative">

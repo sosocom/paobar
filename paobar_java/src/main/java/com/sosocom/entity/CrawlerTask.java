@@ -24,6 +24,12 @@ public class CrawlerTask {
 
     private Long tabId;
 
+    /**
+     * 触发该任务的账号 code（仅账号批量爬取时填）。单曲爬取保持为 null。
+     * 用作队列检索 / 进度归属，不参与唯一性。
+     */
+    private String accountCode;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 

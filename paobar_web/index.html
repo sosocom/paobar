@@ -2,9 +2,28 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>吉他和弦谱</title>
+    <!-- viewport-fit=cover：让内容延伸到刘海和 Home 指示条下方，由 env(safe-area-inset-*) 处理 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+
+    <!-- 系统 UI 主题色（状态栏、任务切换卡片等） -->
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- iOS 添加到主屏幕后以 standalone 方式启动（无浏览器 UI） -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="泡吧吉他谱" />
+
+    <!-- 图标：favicon / apple-touch-icon / 通用 -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+    <link rel="mask-icon" href="/icon.svg" color="#ef4444" />
+
+    <title>泡吧吉他谱</title>
   </head>
   <body>
     <div id="app"></div>

@@ -4,13 +4,15 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 吉他谱管理系统启动类
  */
 @SpringBootApplication
 @MapperScan("com.sosocom.mapper")
-@EnableAsync  // 启用异步支持
+@EnableAsync
+@EnableScheduling
 public class PaoBarApplication {
 
     public static void main(String[] args) {

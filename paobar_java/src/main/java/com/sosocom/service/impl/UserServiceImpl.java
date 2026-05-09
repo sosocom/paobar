@@ -7,9 +7,11 @@ import com.sosocom.dto.LoginResultDTO;
 import com.sosocom.dto.SongDTO;
 import com.sosocom.dto.UserProfileDTO;
 import com.sosocom.dto.UserStatsDTO;
+import com.sosocom.entity.Playlist;
 import com.sosocom.entity.Song;
 import com.sosocom.entity.User;
 import com.sosocom.entity.UserFavorite;
+import com.sosocom.mapper.PlaylistMapper;
 import com.sosocom.mapper.SongMapper;
 import com.sosocom.mapper.UserFavoriteMapper;
 import com.sosocom.mapper.UserMapper;
@@ -34,6 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserFavoriteMapper userFavoriteMapper;
+
+    @Autowired
+    private PlaylistMapper playlistMapper;
 
     @Autowired
     private SongMapper songMapper;
@@ -80,11 +85,15 @@ public class UserServiceImpl implements UserService {
         if (userMapper.selectCount(wrapper) > 0) {
             return null;
         }
+        // 系统中尚无任何用户时，第一个注册者自动成为管理员，
+        // 解决全新部署后没有管理员可登入后台的引导问题
+        boolean isFirstUser = userMapper.selectCount(null) == 0;
         User user = new User();
         user.setUsername(name);
         user.setPassword(passwordEncoder.encode(password));
         user.setStatus(1);
         user.setDeleted(0);
+        user.setIsAdmin(isFirstUser ? 1 : 0);
         user.setPoints(0);
         user.setCollected(0);
         user.setPlaylistsCount(0);
@@ -101,12 +110,34 @@ public class UserServiceImpl implements UserService {
         dto.setUsername(user.getUsername());
         dto.setAvatar(user.getAvatar());
         dto.setPoints(user.getPoints());
+        dto.setIsAdmin(user.getIsAdmin() != null && user.getIsAdmin() == 1);
         UserStatsDTO stats = new UserStatsDTO();
-        stats.setCollected(user.getCollected());
-        stats.setPlaylists(user.getPlaylistsCount());
-        stats.setPracticeHours(user.getPracticeHours());
+        // 收藏数 / 歌单数改为实时 COUNT，避免 user 表里冗余字段与真实明细表漂移。
+        // practiceHours 目前没有明细埋点，仍然走 user 表字段。
+        stats.setCollected(countFavorites(user.getId()));
+        stats.setPlaylists(countUserPlaylists(user.getId()));
+        stats.setPracticeHours(user.getPracticeHours() == null ? 0 : user.getPracticeHours());
         dto.setStats(stats);
         return dto;
+    }
+
+    /** 实时统计该用户收藏的歌曲数。 */
+    private int countFavorites(Long userId) {
+        if (userId == null) return 0;
+        LambdaQueryWrapper<UserFavorite> w = new LambdaQueryWrapper<>();
+        w.eq(UserFavorite::getUserId, userId);
+        Long c = userFavoriteMapper.selectCount(w);
+        return c == null ? 0 : c.intValue();
+    }
+
+    /** 实时统计该用户创建的自建歌单数量（不包含 AI 歌单等公共资源）。 */
+    private int countUserPlaylists(Long userId) {
+        if (userId == null) return 0;
+        LambdaQueryWrapper<Playlist> w = new LambdaQueryWrapper<>();
+        w.eq(Playlist::getUserId, userId);
+        w.eq(Playlist::getType, "user");
+        Long c = playlistMapper.selectCount(w);
+        return c == null ? 0 : c.intValue();
     }
 
     @Override

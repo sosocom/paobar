@@ -1,11 +1,13 @@
 package com.sosocom.crawler;
 
 import com.sosocom.entity.Song;
+import com.sosocom.tabdoc.TabHtmlNormalizer;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,9 @@ public class YopuCrawler {
 
     @Value("${crawler.timeout}")
     private int timeout;
+
+    @Autowired
+    private TabHtmlNormalizer tabHtmlNormalizer;
 
     /**
      * 爬取吉他谱详情
@@ -89,11 +94,13 @@ public class YopuCrawler {
                 }
                 
                 // ============================================
-                // 3. 保存处理后的 HTML 内容
+                // 3. 规范化 HTML → TabDocument JSON 入库
                 // ============================================
                 String cleanedHtml = targetElement.outerHtml();
-                song.setTabContent(cleanedHtml);
-                log.info("成功保存吉他谱HTML内容，长度: {}", cleanedHtml.length());
+                String tabJson = tabHtmlNormalizer.normalizeToJson(cleanedHtml, song.getSongName());
+                song.setTabContentJson(tabJson);
+                log.info("成功规范化吉他谱 JSON，长度: {}（源 HTML 长度: {}）",
+                        tabJson.length(), cleanedHtml.length());
             }
 
             // 解析歌词（从隐藏的 article 标签或主要内容中提取文本）

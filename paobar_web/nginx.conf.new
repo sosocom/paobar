@@ -1,0 +1,132 @@
+
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    # Service Worker 要求以 application/javascript 返回
+    # Web Manifest 要以 application/manifest+json 返回
+    types {
+        application/manifest+json  webmanifest;
+    }
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    # 开启 Gzip 压缩
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 5;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json application/manifest+json image/svg+xml;
+    gzip_disable "MSIE [1-6]\.";
+
+    # HTTP 重定向到 HTTPS
+    server {
+        listen       80;
+        server_name  paobar.com www.paobar.com;
+        return 301 https://paobar.com$request_uri;
+    }
+
+    # HTTPS 服务器配置
+    server {
+        listen        443 ssl;
+        server_name  paobar.com www.paobar.com;
+
+        # SSL 证书配置
+        ssl_certificate     /opt/nginx/ssl/paobar.com.pem;
+        ssl_certificate_key /opt/nginx/ssl/paobar.com.key;
+        ssl_session_cache    shared:SSL:10m;
+        ssl_session_timeout  10m;
+        ssl_ciphers  HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers  on;
+
+        # 静态文件根目录
+        root html/paobar/dist;
+        index index.html index.htm;
+
+        # ========== PWA：必须 no-cache，否则 SW/manifest 更新推不到用户 ==========
+
+        # Service Worker 入口文件（vite-plugin-pwa 固定产出 /sw.js）
+        location = /sw.js {
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            add_header Pragma "no-cache";
+            add_header Expires "0";
+            default_type application/javascript;
+        }
+
+        # Workbox 运行时脚本（命名形如 /workbox-xxxxxxxx.js）
+        location ~ ^/workbox-.*\.js$ {
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            default_type application/javascript;
+        }
+
+        # Web App Manifest
+        location = /manifest.webmanifest {
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            default_type application/manifest+json;
+        }
+
+        # index.html 禁用缓存（重要！避免前端更新问题）
+        location = /index.html {
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            add_header Pragma "no-cache";
+            add_header Expires "0";
+        }
+
+        # ========== 普通静态资源强缓存 ==========
+
+        # 注意：上面的 exact / regex location 会先命中 sw.js / workbox-*.js / manifest.webmanifest，
+        # 所以这里的通配规则只会作用在其他带 hash 的资源上（例如 /assets/*.js）。
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # SPA 路由支持（hash 模式可选，history 模式必需）
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        # 后端 API 代理
+        location /api {
+            proxy_pass http://localhost:8001;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # 超时设置（爬虫可能需要较长时间）
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+    }
+
+
+}

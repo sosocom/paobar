@@ -1,6 +1,7 @@
 package com.sosocom.crawler;
 
 import com.sosocom.entity.Song;
+import com.sosocom.tabdoc.TabHtmlNormalizer;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -13,6 +14,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,9 @@ public class SeleniumCrawler {
 
     @Value("${crawler.headless:true}")
     private boolean headless;
+
+    @Autowired
+    private TabHtmlNormalizer tabHtmlNormalizer;
 
     /**
      * 初始化 WebDriverManager
@@ -167,13 +172,14 @@ public class SeleniumCrawler {
                 log.info("清洗后的 HTML 长度: {}", targetHtml.length());
             }
             
-            // 保存完整的吉他谱内容（渲染后的 HTML）
+            // 规范化 HTML → TabDocument JSON 入库（不再保留原始 HTML）
             if (!targetHtml.isEmpty()) {
-                song.setTabContent(targetHtml);
-                log.info("成功保存渲染后的吉他谱HTML内容，长度: {}", targetHtml.length());
-                
-                // 检查是否包含和弦信息
-                boolean hasChords = targetHtml.contains("hexi-chord");
+                String tabJson = tabHtmlNormalizer.normalizeToJson(targetHtml, song.getSongName());
+                song.setTabContentJson(tabJson);
+                log.info("成功规范化吉他谱 JSON，长度: {}（源 HTML 长度: {}）",
+                        tabJson.length(), targetHtml.length());
+
+                boolean hasChords = targetHtml.contains("xhe-chord-anchor") || targetHtml.contains("hexi-chord");
                 log.info("是否包含和弦信息: {}", hasChords ? "是" : "否");
             } else {
                 log.warn("未找到有效的吉他谱内容");

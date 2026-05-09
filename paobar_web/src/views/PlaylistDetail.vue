@@ -1,74 +1,137 @@
 <template>
-  <div class="min-h-screen pb-20">
-    <!-- Header with Back Button -->
-    <header class="sticky top-0 z-40 bg-background-card/95 backdrop-blur-xl">
-      <!-- Top Bar -->
-      <div class="px-4 py-3 flex items-center gap-3">
-        <button @click="goBack" class="p-1">
-          <ChevronLeft :size="24" class="text-text-primary" />
+  <div class="min-h-screen pb-nav">
+    <!-- Sticky 透明顶栏：仅保留返回按钮，针对歌单整体的操作下沉到 Hero -->
+    <header class="sticky top-0 z-40 bg-gradient-to-b from-background-card/85 via-background-card/35 to-transparent backdrop-blur-md">
+      <div class="px-3 py-2.5 flex items-center">
+        <button
+          @click="goBack"
+          class="p-2 rounded-full hover:bg-background-overlay/50 transition-colors"
+          aria-label="返回"
+        >
+          <ChevronLeft :size="22" class="text-text-primary" />
         </button>
-        <h1 class="text-lg font-semibold flex-1">歌单</h1>
-      </div>
-      
-      <!-- Playlist Info Card -->
-      <div class="px-4 pb-4">
-        <div class="bg-background-overlay/50 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-4">
-          <div 
-            class="w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0"
-            :style="playlist ? `background: linear-gradient(135deg, ${playlist.gradient?.[0]}, ${playlist.gradient?.[1]})` : ''"
-          >
-            <Sparkles v-if="playlist?.type === 'ai'" :size="32" class="text-white" />
-            <ListMusic v-else :size="32" class="text-white" />
-          </div>
-          
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <template v-if="isEditingName">
-                <input
-                  v-model="editNameValue"
-                  ref="nameInputRef"
-                  type="text"
-                  class="flex-1 min-w-0 text-xl font-semibold bg-background-overlay/50 rounded-lg px-2 py-1 border border-white/10 focus:border-primary/50 focus:outline-none"
-                  @keydown.enter="savePlaylistName"
-                  @keydown.escape="cancelEditName"
-                />
-                <button
-                  @click="savePlaylistName"
-                  :disabled="savingName || !editNameValue?.trim()"
-                  class="p-2 rounded-lg bg-primary text-white hover:bg-primary/90 disabled:opacity-50"
-                  title="保存"
-                >
-                  <Check :size="20" />
-                </button>
-                <button
-                  @click="cancelEditName"
-                  :disabled="savingName"
-                  class="p-2 rounded-lg bg-background-overlay/50 text-text-secondary hover:bg-background-overlay disabled:opacity-50"
-                  title="取消"
-                >
-                  <X :size="20" />
-                </button>
-              </template>
-              <template v-else>
-                <h2 class="text-xl font-semibold truncate flex-1">{{ playlist?.name }}</h2>
-                <button
-                  v-if="playlist?.type === 'user'"
-                  @click="startEditName"
-                  class="flex-shrink-0 p-2 rounded-lg text-text-secondary hover:bg-background-overlay/50 hover:text-text-primary transition-colors"
-                  title="编辑歌单名"
-                >
-                  <Pencil :size="18" />
-                </button>
-              </template>
-            </div>
-            <p class="text-sm text-text-secondary mb-2">{{ playlist?.songCount }} 首歌曲</p>
-            <p v-if="playlist?.type === 'ai'" class="text-xs text-primary">
-              和弦走向: {{ playlist?.chordProgression }}
-            </p>
-          </div>
-        </div>
       </div>
     </header>
+
+    <!-- Hero：封面 + 标题 + 类型徽章；带 ambient glow -->
+    <section v-if="playlist" class="relative px-4 pt-2 pb-5 overflow-hidden">
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute -top-16 -left-16 w-80 h-80 rounded-full opacity-35 blur-3xl"
+        :style="`background: radial-gradient(circle, ${playlist.gradient?.[0] || '#6366f1'}, transparent 70%)`"
+      ></div>
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute -top-8 right-0 w-72 h-72 rounded-full opacity-30 blur-3xl"
+        :style="`background: radial-gradient(circle, ${playlist.gradient?.[1] || '#a855f7'}, transparent 70%)`"
+      ></div>
+
+      <div class="relative flex items-center gap-4">
+        <!-- Cover -->
+        <div
+          class="w-28 h-28 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl shadow-black/40 ring-1 ring-white/10"
+          :style="`background: linear-gradient(135deg, ${playlist.gradient?.[0] || '#6366f1'}, ${playlist.gradient?.[1] || '#a855f7'})`"
+        >
+          <Sparkles v-if="playlist.type === 'ai'" :size="44" class="text-white drop-shadow" />
+          <ListMusic v-else :size="44" class="text-white drop-shadow" />
+        </div>
+
+        <!-- 右侧：标题 + 编辑/删除（同排） + 元信息 -->
+        <div class="flex-1 min-w-0">
+          <template v-if="isEditingName">
+            <input
+              v-model="editNameValue"
+              ref="nameInputRef"
+              type="text"
+              class="w-full text-xl font-bold bg-background-overlay/60 rounded-lg px-2 py-1.5 border border-white/10 focus:border-primary/50 focus:outline-none mb-2"
+              @keydown.enter="savePlaylistName"
+              @keydown.escape="cancelEditName"
+            />
+            <div class="flex items-center gap-2">
+              <button
+                @click="savePlaylistName"
+                :disabled="savingName || !editNameValue?.trim()"
+                class="px-3 py-1.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1.5"
+              >
+                <Check :size="14" />
+                保存
+              </button>
+              <button
+                @click="cancelEditName"
+                :disabled="savingName"
+                class="px-3 py-1.5 rounded-lg bg-background-overlay/50 text-text-secondary text-sm hover:bg-background-overlay disabled:opacity-50 inline-flex items-center gap-1.5"
+              >
+                <X :size="14" />
+                取消
+              </button>
+            </div>
+          </template>
+          <template v-else>
+            <!-- 第一行：标题 + 编辑/删除 -->
+            <div class="flex items-start gap-3 mb-2">
+              <h2 class="flex-1 min-w-0 text-2xl font-bold leading-tight line-clamp-2 break-words">{{ playlist.name }}</h2>
+              <div
+                v-if="playlist.type === 'user'"
+                class="flex items-center gap-1 flex-shrink-0 -mr-1"
+              >
+                <button
+                  @click="startEditName"
+                  class="p-1.5 rounded-full text-text-secondary hover:text-text-primary hover:bg-background-overlay/60 transition-colors"
+                  title="重命名"
+                  aria-label="重命名"
+                >
+                  <Pencil :size="16" />
+                </button>
+                <button
+                  @click="showDeletePlaylistDialog = true"
+                  class="p-1.5 rounded-full text-text-secondary hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="删除歌单"
+                  aria-label="删除歌单"
+                >
+                  <Trash2 :size="16" />
+                </button>
+              </div>
+            </div>
+
+            <!-- 第二行：meta（左对齐保持原间距）+ 播放全部（右对齐，同一行） -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                v-if="playlist.type === 'ai'"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/15 text-primary tracking-wide"
+              >
+                <Sparkles :size="10" />
+                AI 推荐
+              </span>
+              <span
+                v-else
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/10 text-text-secondary tracking-wide"
+              >
+                我的歌单
+              </span>
+              <span class="text-[11px] text-text-secondary">
+                共 {{ playlist.songCount ?? 0 }} 首
+              </span>
+              <span
+                v-if="playlist.type === 'ai' && playlist.chordProgression"
+                class="text-[11px] text-text-secondary"
+              >
+                · 和弦走向
+                <span class="text-primary font-medium ml-0.5">{{ playlist.chordProgression }}</span>
+              </span>
+
+              <button
+                @click="playAll"
+                :disabled="playlistSongs.length === 0"
+                class="ml-auto inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-white text-xs font-semibold shadow-md shadow-primary/30 active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+              >
+                <Play :size="12" class="fill-white ml-0.5" />
+                播放全部
+              </button>
+            </div>
+          </template>
+        </div>
+      </div>
+    </section>
 
     <!-- Loading State -->
     <div v-if="loading" class="text-center py-12">
@@ -76,8 +139,8 @@
       <p class="text-text-secondary text-sm mt-3">加载中...</p>
     </div>
 
-    <!-- Song List (可拖动排序) -->
-    <div v-else class="px-4 py-4 space-y-3 song-list-drag">
+    <!-- Song List (可拖动排序，左右顶满) -->
+    <div v-else class="pb-4 space-y-2 song-list-drag">
       <div 
         v-for="(song, idx) in playlistSongs" 
         :key="'song-' + song.id"
@@ -88,30 +151,33 @@
         @dragleave="onDragLeave($event, idx)"
         @drop.prevent="onDrop($event, idx)"
       >
-        <!-- Main Song Info - Clickable -->
+        <!-- 拖动手柄（仅用户歌单，放在序号之前） -->
+        <div
+          v-if="playlist?.type === 'user'"
+          class="flex items-center justify-center w-6 h-10 flex-shrink-0 cursor-grab active:cursor-grabbing select-none text-text-secondary/60 hover:text-text-secondary transition-colors"
+          draggable="true"
+          @dragstart="onDragStart($event, idx)"
+          @dragend="onDragEnd"
+          title="拖动排序"
+        >
+          <GripVertical :size="16" class="pointer-events-none" />
+        </div>
+
+        <!-- 整行可点击：序号 + 信息（点击 = 播放） -->
         <div 
           @click="playSong(song, idx)"
-          class="flex gap-3 flex-1 min-w-0 cursor-pointer"
+          class="flex gap-3 flex-1 min-w-0 cursor-pointer items-center"
         >
-          <!-- Index Number -->
           <div class="flex items-center justify-center w-6 text-text-secondary text-sm font-medium flex-shrink-0">
             {{ idx + 1 }}
           </div>
           
-          <!-- Info -->
           <div class="flex-1 min-w-0">
             <h3 class="font-medium truncate mb-1">{{ song.title }}</h3>
-            <p class="text-sm text-text-secondary truncate mb-2">{{ song.artist }}</p>
+            <p class="text-sm text-text-secondary truncate" :class="{ 'mb-1': song.meta }">{{ song.artist }}</p>
             <p v-if="song.meta" class="text-xs text-text-secondary truncate">
               {{ song.meta }}
             </p>
-          </div>
-          
-          <!-- Play Icon -->
-          <div class="flex items-center flex-shrink-0">
-            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Play :size="20" class="text-primary ml-0.5" />
-            </div>
           </div>
         </div>
         
@@ -135,26 +201,15 @@
           </button>
         </template>
         
-        <!-- Remove Button -->
+        <!-- 移出歌单：小图标，最右 -->
         <button 
           @click.stop="confirmRemoveSong(song)"
-          class="flex items-center justify-center p-2 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
+          class="flex items-center justify-center p-2 rounded-lg text-text-secondary/70 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
           title="移出歌单"
+          aria-label="移出歌单"
         >
-          <X :size="20" class="text-red-400" />
+          <Trash2 :size="16" />
         </button>
-
-        <!-- 拖动手柄（仅用户歌单，放最后） -->
-        <div
-          v-if="playlist?.type === 'user'"
-          class="flex items-center justify-center w-8 h-10 flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
-          draggable="true"
-          @dragstart="onDragStart($event, idx)"
-          @dragend="onDragEnd"
-          title="拖动排序"
-        >
-          <GripVertical :size="18" class="text-text-secondary pointer-events-none" />
-        </div>
       </div>
       
       <!-- Empty State -->
@@ -163,6 +218,40 @@
         <p class="text-text-secondary">歌单为空</p>
       </div>
     </div>
+
+    <!-- Confirm Delete Playlist Dialog -->
+    <Transition name="dialog">
+      <div v-if="showDeletePlaylistDialog" class="fixed inset-0 z-50 flex items-center justify-center" @click.self="closeDeletePlaylistDialog">
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-black/60" @click="closeDeletePlaylistDialog"></div>
+
+        <!-- Dialog Content -->
+        <div class="relative bg-background-card rounded-3xl p-6 w-[90%] max-w-md">
+          <h2 class="text-lg font-semibold mb-2">删除歌单</h2>
+          <p class="text-sm text-text-secondary mb-4">
+            确定要删除歌单《{{ playlist?.name }}》吗？此操作不可恢复，歌单内的歌曲收藏关系将被移除。
+          </p>
+
+          <!-- Buttons -->
+          <div class="flex gap-3">
+            <button
+              @click="closeDeletePlaylistDialog"
+              :disabled="deletingPlaylist"
+              class="flex-1 py-3 rounded-xl bg-background-overlay/50 text-text-secondary hover:bg-background-overlay disabled:opacity-50 transition-colors"
+            >
+              取消
+            </button>
+            <button
+              @click="deletePlaylist"
+              :disabled="deletingPlaylist"
+              class="flex-1 py-3 rounded-xl bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {{ deletingPlaylist ? '删除中...' : '删除' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
 
     <!-- Confirm Remove Dialog -->
     <Transition name="dialog">
@@ -202,7 +291,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ChevronLeft, Play, ListMusic, Sparkles, Music, X, Pencil, Check, GripVertical, ArrowUpToLine, ArrowDownToLine } from 'lucide-vue-next'
+import { ChevronLeft, Play, ListMusic, Sparkles, Music, X, Pencil, Check, GripVertical, ArrowUpToLine, ArrowDownToLine, Trash2 } from 'lucide-vue-next'
 import { api } from '@/api'
 import type { Song, Playlist } from '@/types'
 
@@ -216,6 +305,10 @@ const loading = ref(false)
 const showRemoveDialog = ref(false)
 const songToRemove = ref<Song | null>(null)
 const removing = ref(false)
+
+// 删除整个歌单
+const showDeletePlaylistDialog = ref(false)
+const deletingPlaylist = ref(false)
 
 // 编辑歌单名
 const isEditingName = ref(false)
@@ -278,6 +371,31 @@ const removeSong = async () => {
 const closeRemoveDialog = () => {
   showRemoveDialog.value = false
   songToRemove.value = null
+}
+
+// 删除整个歌单
+const deletePlaylist = async () => {
+  if (!playlist.value) return
+  deletingPlaylist.value = true
+  try {
+    const ok = await api.deletePlaylist(playlist.value.id)
+    if (ok) {
+      closeDeletePlaylistDialog()
+      router.replace({ name: 'Playlists' })
+    } else {
+      alert('删除失败，请重试')
+    }
+  } catch (error) {
+    console.error('Failed to delete playlist:', error)
+    alert('删除失败，请重试')
+  } finally {
+    deletingPlaylist.value = false
+  }
+}
+
+const closeDeletePlaylistDialog = () => {
+  if (deletingPlaylist.value) return
+  showDeletePlaylistDialog.value = false
 }
 
 // 开始编辑歌单名
@@ -409,6 +527,12 @@ const playSong = (song: Song, index: number) => {
     params: { id: song.id },
     query: { playlistId: playlist.value?.id }
   })
+}
+
+// 播放全部：跳到第一首并附上 playlistId，由 NowPlaying 接管顺序播放
+const playAll = () => {
+  if (!playlist.value || playlistSongs.value.length === 0) return
+  playSong(playlistSongs.value[0], 0)
 }
 </script>
 

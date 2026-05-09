@@ -51,22 +51,23 @@ class _Body extends StatelessWidget {
 
     final baseStyle = TextStyle(
       fontSize: 17,
-      height: 2.4, // 预留上方和弦空间
+      // 对齐 Web `xhe-text { line-height: 3.5em }`，给上方和弦留出绝对定位空间。
+      height: 3.5,
       color: palette.fontMain,
       letterSpacing: 0.07 * 17,
       fontFamilyFallback: kChineseFontFallback,
     );
 
-    final body = <Widget>[SheetHeaderView(header: document.header)];
+    final body = <Widget>[SheetHeaderView(document: document)];
 
     for (final block in document.blocks) {
       body.add(
-        block.when(
-          headline: (text) => _Headline(text: text),
-          paragraph: (segments) =>
-              _Paragraph(segments: segments, baseStyle: baseStyle, onChordTap: onChordTap),
-          blank: () => const SizedBox(height: 16),
-        ),
+        switch (block) {
+          Headline(:final text) => _Headline(text: text),
+          Paragraph(:final segments) =>
+            _Paragraph(segments: segments, baseStyle: baseStyle, onChordTap: onChordTap),
+          Blank() => const SizedBox(height: 16),
+        },
       );
     }
 
@@ -131,25 +132,23 @@ class _Paragraph extends StatelessWidget {
     final spans = <InlineSpan>[];
     for (final seg in segments) {
       switch (seg) {
-        case PlainText():
-          spans.add(TextSpan(text: seg.text));
-        case ChordText():
+        case PlainText(:final text):
+          spans.add(TextSpan(text: text));
+        case ChordText(:final chord, :final text):
           spans.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.baseline,
               baseline: TextBaseline.alphabetic,
               child: ChordAnchorWidget(
-                chord: seg.chord,
-                text: seg.text,
+                chord: chord,
+                text: text,
                 textStyle: baseStyle,
-                onTap: seg.chord.isEmpty || onChordTap == null
+                onTap: chord.isEmpty || onChordTap == null
                     ? null
-                    : () => onChordTap!(seg.chord),
+                    : () => onChordTap!(chord),
               ),
             ),
           );
-        case LineBreak():
-          spans.add(const TextSpan(text: '\n'));
       }
     }
     return Padding(

@@ -13,8 +13,10 @@ public interface SongService {
      * @param search 搜索关键词（歌曲名或艺术家）
      * @param page 页码，从 1 开始
      * @param pageSize 每页条数
+     * @param indexLetter 歌名拼音首字母筛选：A–Z 或 #（非 a–z 开头），null 表示不限
      */
-    List<SongDTO> getAllSongs(String search, Integer page, Integer pageSize);
+    List<SongDTO> getAllSongs(String search, Integer page, Integer pageSize,
+            String indexLetter);
 
     /**
      * 根据ID获取歌曲

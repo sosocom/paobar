@@ -1,4 +1,4 @@
-import type { Song, Playlist, UserProfile } from '@/types'
+import type { Song, Playlist, UserProfile, AdminUserPage } from '@/types'
 import { getToken, clearAuth } from '@/auth'
 import { requireLogin } from '@/authBus'
 
@@ -60,7 +60,13 @@ class API {
   }
 
   // 获取所有歌曲
-  async getSongs(params?: { genre?: string; search?: string; page?: number; pageSize?: number }): Promise<Song[]> {
+  async getSongs(params?: {
+    genre?: string
+    search?: string
+    page?: number
+    pageSize?: number
+    indexLetter?: string | null
+  }): Promise<Song[]> {
     const queryParams = new URLSearchParams()
     if (params?.genre && params.genre !== '全部') {
       queryParams.append('genre', params.genre)
@@ -73,6 +79,9 @@ class API {
     }
     if (params?.pageSize) {
       queryParams.append('pageSize', params.pageSize.toString())
+    }
+    if (params?.indexLetter) {
+      queryParams.append('indexLetter', params.indexLetter)
     }
 
     const queryString = queryParams.toString()
@@ -140,6 +149,19 @@ class API {
       method: 'PUT',
       body: JSON.stringify({ name }),
     })
+  }
+
+  // 删除整个歌单（仅用户歌单可删）
+  async deletePlaylist(playlistId: string): Promise<boolean> {
+    try {
+      await this.request<boolean>(`/api/playlists/${playlistId}`, {
+        method: 'DELETE',
+      })
+      return true
+    } catch (error) {
+      console.error('删除歌单失败:', error)
+      return false
+    }
   }
 
   // 添加歌曲到歌单
@@ -241,6 +263,85 @@ class API {
   async getFavoriteSongIds(): Promise<string[]> {
     const ids = await this.request<number[]>('/api/user/favorite-ids')
     return ids.map(String)
+  }
+
+  // —— 播放历史 ——
+  // 登录状态下静默记录一次打开行为；未登录或失败都静默吞掉，不打断主流程
+  async recordPlayHistory(songId: string): Promise<void> {
+    try {
+      await this.request<boolean>('/api/history', {
+        method: 'POST',
+        body: JSON.stringify({ songId }),
+      })
+    } catch (error) {
+      // 播放历史失败不应该打扰用户，打印到 console 便于排查即可
+      console.warn('record play history failed:', error)
+    }
+  }
+
+  async getPlayHistory(limit = 100): Promise<Song[]> {
+    return this.request<Song[]>(`/api/history?limit=${limit}`)
+  }
+
+  async deletePlayHistory(songId: string): Promise<boolean> {
+    try {
+      await this.request<boolean>(`/api/history/${songId}`, { method: 'DELETE' })
+      return true
+    } catch (error) {
+      console.error('删除历史失败:', error)
+      return false
+    }
+  }
+
+  async clearPlayHistory(): Promise<boolean> {
+    try {
+      await this.request<number>('/api/history', { method: 'DELETE' })
+      return true
+    } catch (error) {
+      console.error('清空历史失败:', error)
+      return false
+    }
+  }
+
+  // —— 管理员后台 ——
+  // 仅管理员可调用，后端 JwtAuthFilter 已强制 is_admin=1，否则 403
+  async adminListUsers(params?: {
+    keyword?: string
+    page?: number
+    pageSize?: number
+  }): Promise<AdminUserPage> {
+    const qs = new URLSearchParams()
+    if (params?.keyword) qs.append('keyword', params.keyword)
+    if (params?.page) qs.append('page', String(params.page))
+    if (params?.pageSize) qs.append('pageSize', String(params.pageSize))
+    const query = qs.toString()
+    return this.request<AdminUserPage>(`/api/admin/users${query ? `?${query}` : ''}`)
+  }
+
+  async adminSetUserAdmin(userId: string, isAdmin: boolean): Promise<boolean> {
+    try {
+      await this.request<boolean>(`/api/admin/users/${userId}/admin`, {
+        method: 'PUT',
+        body: JSON.stringify({ isAdmin }),
+      })
+      return true
+    } catch (error) {
+      console.error('设置管理员失败:', error)
+      return false
+    }
+  }
+
+  async adminSetUserStatus(userId: string, enabled: boolean): Promise<boolean> {
+    try {
+      await this.request<boolean>(`/api/admin/users/${userId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ enabled }),
+      })
+      return true
+    } catch (error) {
+      console.error('设置状态失败:', error)
+      return false
+    }
   }
 }
 

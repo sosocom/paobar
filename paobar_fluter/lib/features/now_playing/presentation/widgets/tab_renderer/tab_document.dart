@@ -1,57 +1,68 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'tab_document.freezed.dart';
+part 'tab_document.g.dart';
 
-/// 整本谱：header（标题/唱编/meta）+ 结构化正文。
+/// 规范化吉他谱文档。字段完全对齐 `paobar_java` 的 `com.sosocom.tabdoc.TabDocument`，
+/// 直接 `JSON ↔ freezed` 互通。爬虫入库时由 Java 侧 `TabHtmlNormalizer` 生成。
 @freezed
 class TabDocument with _$TabDocument {
   const factory TabDocument({
-    required SheetHeader header,
-    required List<SheetBlock> blocks,
+    @Default(1) int schemaVersion,
+    String? title,
+    @Default(<InfoItem>[]) List<InfoItem> info,
+    String? meter,
+    String? bpm,
+    String? capoKey,
+    String? originalKey,
+    String? chordStyle,
+    String? instrument,
+    @Default(<SheetBlock>[]) List<SheetBlock> blocks,
   }) = _TabDocument;
+
+  factory TabDocument.fromJson(Map<String, dynamic> json) =>
+      _$TabDocumentFromJson(json);
 }
 
+/// "唱: 李健"、"编: 菜鸟吉他" 这样的 label-text 项。
 @freezed
-class SheetHeader with _$SheetHeader {
-  const factory SheetHeader({
-    required String title,
-    @Default(<SheetInfoItem>[]) List<SheetInfoItem> info,
-    String? meter, // 拍号
-    String? bpm, // 拍速
-    String? capoKey, // 选调
-    String? originalKey, // 原唱调
-  }) = _SheetHeader;
-}
-
-/// 唱 / 编 等 info 项
-@freezed
-class SheetInfoItem with _$SheetInfoItem {
-  const factory SheetInfoItem({
+class InfoItem with _$InfoItem {
+  const factory InfoItem({
     required String label,
     required String text,
-  }) = _SheetInfoItem;
+  }) = _InfoItem;
+
+  factory InfoItem.fromJson(Map<String, dynamic> json) =>
+      _$InfoItemFromJson(json);
 }
 
-/// 段落块：标题（主歌/副歌）/ 文本段 / 空行
-@freezed
+/// 正文段落块。union 辨别符使用 `type` 字段（值 "headline"/"paragraph"/"blank"）。
+@Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
 sealed class SheetBlock with _$SheetBlock {
-  const factory SheetBlock.headline(String text) = Headline;
-  const factory SheetBlock.paragraph(List<LineSegment> segments) = Paragraph;
+  const factory SheetBlock.headline({required String text}) = Headline;
+
+  const factory SheetBlock.paragraph({
+    @Default(<LineSegment>[]) List<LineSegment> segments,
+  }) = Paragraph;
+
   const factory SheetBlock.blank() = Blank;
+
+  factory SheetBlock.fromJson(Map<String, dynamic> json) =>
+      _$SheetBlockFromJson(json);
 }
 
-/// 行内片段：纯文本 / 带和弦的文本。
-@freezed
+/// 行内片段。union 辨别符同样为 `type`（值 "text"/"chord"）。
+@Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
 sealed class LineSegment with _$LineSegment {
-  /// 纯歌词（无和弦上方）
-  const factory LineSegment.text(String text) = PlainText;
+  /// 纯歌词。
+  const factory LineSegment.text({required String text}) = PlainText;
 
-  /// 某字下方带下划线，上方浮着和弦名（可能为空串，空串表示纯占位，对齐 Web 的 data-value-length=0）
+  /// 某字带上方和弦名（chord 可为空串，表示纯占位锚点）。
   const factory LineSegment.chord({
     required String chord,
-    required String text,
+    @Default('') String text,
   }) = ChordText;
 
-  /// 换行
-  const factory LineSegment.lineBreak() = LineBreak;
+  factory LineSegment.fromJson(Map<String, dynamic> json) =>
+      _$LineSegmentFromJson(json);
 }

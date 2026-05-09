@@ -38,6 +38,11 @@ public interface PlaylistService {
      * 更新歌单名称（仅 user 类型歌单可改）
      */
     PlaylistDTO updatePlaylistName(String id, String name);
+
+    /**
+     * 删除歌单（仅 user 类型且属于当前用户的歌单可删）
+     */
+    boolean deletePlaylist(String id);
     
     /**
      * 添加歌曲到歌单

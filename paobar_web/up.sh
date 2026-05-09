@@ -58,16 +58,19 @@ if [ -f dist.tar.gz ]; then
     mkdir -p /opt/nginx/html/paobar
     tar -xzf dist.tar.gz -C /opt/nginx/html/paobar/
     
-    # 设置权限
-    chown -R www-data:www-data /opt/nginx/html/paobar/dist
-    
-    # 重启 nginx 清除缓存
-    echo "  重启 nginx..."
-    systemctl reload nginx
-    
+    # 设置权限（这台机器 nginx worker 跑的是 nobody 用户）
+    chown -R nobody:nobody /opt/nginx/html/paobar/dist 2>/dev/null || true
+
+    # 重启 nginx 清除缓存（源码编译安装，没走 systemd）
+    echo "  reload nginx..."
+    /opt/nginx/sbin/nginx -t && /opt/nginx/sbin/nginx -s reload
+
     # 清理临时文件
     rm -f /tmp/dist.tar.gz
-    
+
+    # 只保留最近 3 份备份，防止盘越堆越大
+    ls -1dt /opt/nginx/html/paobar/dist.bak.* 2>/dev/null | tail -n +4 | xargs -r rm -rf
+
     echo "  ✓ 部署完成"
 else
     echo "  ❌ 未找到上传的文件"

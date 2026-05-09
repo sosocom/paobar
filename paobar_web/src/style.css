@@ -6,24 +6,66 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  
+
   color-scheme: dark;
   background-color: #0A0A0A;
+
+  /* 安全区 + 导航高度体系（PWA standalone 模式下的视觉对齐基础）：
+   * --status-height    : 顶部系统状态栏（电池/时间）占用高度
+   *                     iOS standalone 下 = env(safe-area-inset-top)（刘海机 ~47px / 直板机 20px）
+   *                     浏览器内打开或非刘海安卓 = 0
+   * --nav-inner-height : 底部导航条可点击区域（64px）
+   * --nav-height       : 底部导航实际占屏高度 = inner + iPhone Home 指示条
+   *
+   * 全站规则：
+   *   - #app 整体下移 --status-height，让内容永远从状态栏下方开始
+   *   - 定高页面用 .h-screen-no-nav（同时扣掉顶栏和底栏）
+   *   - 滚动页面用 .pb-nav，配合 min-h-screen 即可
+   */
+  --status-height: env(safe-area-inset-top, 0px);
+  --nav-inner-height: 4rem;
+  --nav-height: calc(var(--nav-inner-height) + env(safe-area-inset-bottom, 0px));
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  /* iOS standalone 下，防止橡皮筋滚动露出白底；
+     同时保证 #app 顶部 padding 区域（状态栏下方）颜色与页面一致。 */
+  background-color: #0A0A0A;
+  /* 禁用系统自动字号调整（竖屏-横屏切换时避免字体跳动） */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 #app {
   width: 100%;
+  /* 让所有页面内容从状态栏下方开始，避免被 iOS 顶部电池/时间遮挡 */
+  padding-top: var(--status-height);
+  /* 用 dvh 兼容移动端动态视口；旧浏览器回退到 vh */
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* ============================================================
+ * 底部导航安全区工具类：与 BottomNav 配合
+ * ============================================================ */
+
+/* 给滚动/内容容器留出导航高度，避免内容被 nav 遮住 */
+.pb-nav {
+  padding-bottom: var(--nav-height);
+}
+
+/* 顶部有 header、底部有 nav、中间一屏可滚动的页面用这个高度约束。
+   #app 已经整体下移 --status-height，这里再扣一次 --nav-height 即可，
+   状态栏的高度不在 100dvh 里"额外加回"——100dvh 本来就是可视窗口。 */
+.h-screen-no-nav {
+  height: calc(100dvh - var(--nav-height) - var(--status-height));
 }
 
 /* 自定义滚动条样式 */

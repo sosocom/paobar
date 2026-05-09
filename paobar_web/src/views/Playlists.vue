@@ -1,11 +1,7 @@
 <template>
-  <div class="min-h-screen pb-20">
-    <!-- Header -->
-    <header class="sticky top-0 z-40 bg-background-card/95 backdrop-blur-xl px-4 py-4">
-      <h1 class="text-2xl font-semibold text-center">歌单</h1>
-    </header>
-
-    <div class="px-4 py-6 space-y-8">
+  <div class="min-h-screen pb-nav">
+    <!-- 去掉顶部标题栏，直接进入内容区；status bar 已由 #app padding-top 让位 -->
+    <div class="px-4 pt-4 pb-6 space-y-8">
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -15,22 +11,29 @@
       <template v-else>
         <!-- User Playlists -->
         <section>
-        <div class="flex items-center justify-between mb-4">
+        <!-- 合并版 toolbar：标题视觉居中（relative 占满整行 + absolute 定位 + 按钮到右侧），
+             这样无论按钮在不在，"我的歌单"都保持在屏幕中心线 -->
+        <div class="relative flex items-center justify-center mb-3 h-9">
           <h2 class="text-lg font-medium">我的歌单</h2>
-        </div>
-        
-        <div class="space-y-3">
-          <!-- Create Playlist Button -->
-          <button 
+          <button
             @click="showCreateDialog = true"
-            class="w-full bg-background-card/50 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-3 hover:bg-background-card/70 transition-all"
+            aria-label="创建歌单"
+            class="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background-card/60 backdrop-blur-sm flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-background-card/80 transition-all"
           >
-            <div class="w-16 h-16 rounded-xl bg-background-overlay/50 flex items-center justify-center">
-              <PlusCircle :size="28" class="text-text-secondary" />
-            </div>
-            <span class="text-text-secondary">创建歌单</span>
+            <PlusCircle :size="20" />
           </button>
-          
+        </div>
+
+        <div class="space-y-3">
+          <!-- Empty State：没有歌单时给个引导性占位，避免区块空白 -->
+          <div
+            v-if="userPlaylists.length === 0"
+            @click="showCreateDialog = true"
+            class="bg-background-card/30 border border-dashed border-white/10 rounded-2xl p-6 text-center text-sm text-text-secondary cursor-pointer hover:bg-background-card/50 transition-all"
+          >
+            还没有歌单，点击右上角 + 创建一个
+          </div>
+
           <!-- User Playlist Cards -->
           <div 
             v-for="playlist in userPlaylists" 

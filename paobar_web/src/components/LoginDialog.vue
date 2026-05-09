@@ -1,22 +1,17 @@
 <template>
   <Transition name="login-dialog">
-    <div v-if="showLoginDialog" class="fixed inset-0 z-[100] flex items-end justify-center" @click.self="dismiss">
+    <div v-if="showLoginDialog" class="fixed inset-0 z-[100] flex items-center justify-center p-4" @click.self="dismiss">
       <!-- Overlay -->
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="dismiss"></div>
 
-      <!-- Bottom Sheet -->
-      <div class="relative w-full max-w-md bg-background-card rounded-t-3xl px-6 pt-5 pb-8 animate-slide-up">
-        <!-- Drag Handle -->
-        <div class="flex justify-center mb-4">
-          <div class="w-10 h-1 bg-text-secondary/30 rounded-full"></div>
-        </div>
-
+      <!-- Centered Dialog -->
+      <div class="relative w-full max-w-md bg-background-card rounded-3xl px-6 pt-6 pb-6 animate-fade-in-up shadow-2xl">
         <!-- Close Button -->
-        <button @click="dismiss" class="absolute top-5 right-5 p-1 text-text-secondary hover:text-text-primary transition-colors">
+        <button @click="dismiss" class="absolute top-4 right-4 p-1 text-text-secondary hover:text-text-primary transition-colors">
           <X :size="20" />
         </button>
 
-        <h2 class="text-xl font-bold text-text-primary mb-1">{{ isLogin ? '登录' : '注册' }}</h2>
+        <h2 class="text-xl font-bold text-text-primary mb-1 pr-8">{{ isLogin ? '登录' : '注册' }}</h2>
         <p class="text-sm text-text-secondary mb-5">登录后即可使用收藏、歌单等功能</p>
 
         <!-- Tab -->
@@ -69,10 +64,13 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { X } from 'lucide-vue-next'
 import { api } from '@/api'
 import { setToken, setStoredUser } from '@/auth'
 import { showLoginDialog, onLoginSuccess, dismissLoginDialog } from '@/authBus'
+
+const router = useRouter()
 
 const isLogin = ref(true)
 const username = ref('')
@@ -107,7 +105,14 @@ const submit = async () => {
       : await api.register(username.value.trim(), password.value)
     setToken(res.token)
     setStoredUser(res.user)
-    onLoginSuccess() // 关闭弹窗 + 执行回调
+    onLoginSuccess() // 关闭弹窗 + 执行排队回调（收藏/加歌单等失败前置动作）
+    // 登录成功统一落到"我的"页，让用户看到账号已就绪 + 刷新最新数据。
+    // 如果当前已经在 /profile（例如从底部 Tab 触发登录），手动调 Profile 内的刷新事件。
+    if (router.currentRoute.value.name === 'Profile') {
+      window.dispatchEvent(new Event('profile:refresh'))
+    } else {
+      router.push({ name: 'Profile' })
+    }
   } catch (e: any) {
     error.value = e?.message || (isLogin.value ? '登录失败' : '注册失败')
   } finally {
@@ -125,11 +130,11 @@ const submit = async () => {
 .login-dialog-leave-to {
   opacity: 0;
 }
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
+.animate-fade-in-up {
+  animation: fadeInUp 0.22s ease-out;
 }
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 </style>

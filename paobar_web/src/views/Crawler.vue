@@ -1,14 +1,15 @@
 <template>
   <div class="min-h-screen bg-background pb-24">
-    <!-- 顶部栏 -->
-    <header class="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-white/5">
-      <div class="flex items-center justify-center h-16 px-4">
-        <h1 class="text-xl font-semibold text-text-primary">扒谱</h1>
+    <!-- 管理员模式标识：仅管理员可见此页，明确告诉用户进入了受限功能 -->
+    <div class="flex justify-center pt-4 px-5">
+      <div class="w-full max-w-[335px] flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20">
+        <Shield :size="14" class="text-primary flex-shrink-0" />
+        <span class="text-xs text-primary font-medium">管理员模式</span>
+        <span class="text-xs text-text-secondary truncate">扒谱仅对管理员开放</span>
       </div>
-    </header>
-
-    <!-- Tab 切换 -->
-    <div class="flex justify-center pt-6 px-5">
+    </div>
+    <!-- Tab 主入口 -->
+    <div class="flex justify-center pt-3 px-5">
       <div class="w-full max-w-[335px] bg-background-card rounded-xl p-1 flex gap-1">
         <button
           @click="activeTab = 'song'"
@@ -156,6 +157,25 @@
           请输入 yopu.co 用户账号链接
         </p>
 
+        <!-- 快选：常用账号一键填入 -->
+        <div class="mb-4">
+          <p class="text-xs text-text-secondary text-center mb-2">快选</p>
+          <div class="flex flex-wrap gap-2 justify-center">
+            <button
+              v-for="pick in accountQuickPicks"
+              :key="pick.label"
+              type="button"
+              @click="accountUrl = pick.url"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+              :class="isAccountQuickPickActive(pick.url)
+                ? 'bg-primary/15 border-primary text-primary'
+                : 'bg-background-card border-white/10 text-text-secondary hover:border-primary/40 hover:text-primary'"
+            >
+              {{ pick.label }}
+            </button>
+          </div>
+        </div>
+
         <!-- 输入框区域 -->
         <div class="space-y-4">
           <!-- 输入框 -->
@@ -191,8 +211,10 @@
             <div v-if="crawledAccount" class="text-xs text-green-300/80 space-y-1">
               <p v-if="crawledAccount.userName">账号：{{ crawledAccount.userName }}</p>
               <p>总计发现：{{ crawledAccount.totalFound }} 首</p>
+              <p v-if="crawledAccount.alreadyInLibrary > 0">已在库：{{ crawledAccount.alreadyInLibrary }} 首</p>
+              <p v-if="crawledAccount.alreadyPending > 0">已在队列：{{ crawledAccount.alreadyPending }} 首</p>
+              <p v-if="crawledAccount.enqueued > 0">本次入队：{{ crawledAccount.enqueued }} 首</p>
               <p>成功获取：{{ crawledAccount.successCount }} 首</p>
-              <p v-if="crawledAccount.skippedCount > 0">已存在跳过：{{ crawledAccount.skippedCount }} 首</p>
               <p v-if="crawledAccount.failedCount > 0" class="text-red-300">失败：{{ crawledAccount.failedCount }} 首</p>
             </div>
             <button
@@ -205,10 +227,17 @@
         </div>
 
         <!-- 进度提示 -->
-        <div v-if="accountProgress" class="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <div
+          v-if="accountProgress || accountQueueHint"
+          class="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg"
+        >
           <div class="space-y-2">
-            <p class="text-sm text-blue-400">{{ accountProgress }}</p>
-            <div class="w-full bg-background-card rounded-full h-2 overflow-hidden">
+            <p v-if="accountProgress" class="text-sm text-blue-400">{{ accountProgress }}</p>
+            <p v-if="accountQueueHint" class="text-xs text-amber-400/90">{{ accountQueueHint }}</p>
+            <div
+              v-if="accountProgress"
+              class="w-full bg-background-card rounded-full h-2 overflow-hidden"
+            >
               <div 
                 class="h-full bg-primary transition-all duration-300"
                 :style="{ width: `${progressPercent}%` }"
@@ -230,7 +259,8 @@
           </ol>
           <div class="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
             <p class="text-xs text-yellow-400">
-              ⚠️ 注意：爬取账号所有谱可能需要较长时间，请耐心等待
+              ⚠️ 账号队列由服务端定时、分批爬取，关闭页面也会继续；
+              大账号耗时会较长，可稍后在谱库查看进度结果。
             </p>
           </div>
         </div>
@@ -240,15 +270,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import { Shield } from 'lucide-vue-next'
 import { getToken, isLoggedIn } from '@/auth'
 import { requireLogin } from '@/authBus'
 
 const router = useRouter()
 
-// Tab 状态
-const activeTab = ref<'song' | 'account'>('song')
+// Tab 状态：默认「爬账号」，快选「蓝先生」已预填
+const activeTab = ref<'song' | 'account'>('account')
 
 // 爬单曲
 const songUrl = ref('https://yopu.co/view/3PbjYEYP')
@@ -258,13 +289,31 @@ const songSuccess = ref('')
 const crawledSong = ref<any>(null)
 
 // 爬账号
-const accountUrl = ref('https://yopu.co/user#code=b19JMeQX')
+const accountUrl = ref('https://yopu.co/user#code=rp8kWlGP')
+/** 输入框上方的快选（用户主页链接）。第一项即默认选中的账号。 */
+const accountQuickPicks = [
+  { label: '蓝先生', url: 'https://yopu.co/user#code=rp8kWlGP' },
+  { label: '杨昌建', url: 'https://yopu.co/user#code=g104Dqa1' },
+  { label: '菜菜的吉他手', url: 'https://yopu.co/user#code=b19JMeQX' },
+] as const
+
+const isAccountQuickPickActive = (url: string) =>
+  accountUrl.value.trim() === url
 const accountLoading = ref(false)
 const accountError = ref('')
 const accountSuccess = ref('')
 const accountProgress = ref('')
 const crawledAccount = ref<any>(null)
 const progressPercent = ref(0)
+/** 长在跑时提示：队列由后端定时任务继续消费 */
+const accountQueueHint = ref('')
+
+let releaseAccountPoll: (() => void) | null = null
+
+const stopAccountPoll = () => {
+  releaseAccountPoll?.()
+  releaseAccountPoll = null
+}
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
@@ -332,9 +381,11 @@ const crawlAccount = async () => {
     requireLogin(() => crawlAccount())
     return
   }
+  stopAccountPoll()
   accountError.value = ''
   accountSuccess.value = ''
   accountProgress.value = ''
+  accountQueueHint.value = ''
   crawledAccount.value = null
   progressPercent.value = 0
 
@@ -367,8 +418,26 @@ const crawlAccount = async () => {
     const result = await response.json()
 
     if (result.code === 200) {
-      accountProgress.value = '任务已提交，正在爬取中...'
-      progressPercent.value = 5
+      // 后端入队完成后会立刻返回统计：发现总数 / 已在库 / 已在队列 / 新入队
+      const stats = result.data || {}
+      const enqueued = Number(stats.enqueued ?? 0)
+      const totalFound = Number(stats.totalFound ?? 0)
+
+      if (enqueued <= 0) {
+        // 没有新链接需要爬，直接结算成功态（后端 manager 也已经标 COMPLETED）
+        accountLoading.value = false
+        accountProgress.value = ''
+        progressPercent.value = 100
+        crawledAccount.value = stats
+        accountSuccess.value = totalFound > 0
+          ? '账号下所有谱已在库中，无需重新爬取'
+          : '该账号下未发现可爬取的谱链接'
+        accountUrl.value = ''
+        return
+      }
+
+      accountProgress.value = `已入队 ${enqueued} 首（发现 ${totalFound} / 已在库 ${stats.alreadyInLibrary ?? 0} / 已在队列 ${stats.alreadyPending ?? 0}），正在爬取...`
+      progressPercent.value = 1
       pollCrawlStatus(userCode)
     } else {
       accountError.value = result.message || '提交任务失败'
@@ -399,7 +468,13 @@ const extractUserCode = (url: string): string | null => {
 
 // 轮询任务状态
 const pollCrawlStatus = async (userCode: string) => {
-  const pollInterval = setInterval(async () => {
+  stopAccountPoll()
+  const hintTimer = window.setTimeout(() => {
+    if (!accountLoading.value) return
+    accountQueueHint.value =
+      '服务端按固定间隔分批爬取队列，离开本页仍会执行；可随时到谱库查看新谱。'
+  }, 90_000)
+  const pollInterval = window.setInterval(async () => {
     try {
       const response = await authFetch(`${API_BASE_URL}/api/crawler/crawl-account-status/${userCode}`)
       const result = await response.json()
@@ -407,49 +482,57 @@ const pollCrawlStatus = async (userCode: string) => {
       if (result.code === 200) {
         const task = result.data
 
-        if (task.progress) {
-          progressPercent.value = task.progress
+        if (task.total > 0) {
+          progressPercent.value = task.progress || 0
+          // 队列流程下 total = 本次入队数；current = 已处理（成功+失败）数
           accountProgress.value = `正在爬取: ${task.current}/${task.total}`
+            + (task.failedCount > 0 ? ` (失败 ${task.failedCount})` : '')
         }
 
         if (task.status === 'COMPLETED') {
-          clearInterval(pollInterval)
+          stopAccountPoll()
           accountLoading.value = false
           accountProgress.value = ''
+          accountQueueHint.value = ''
           crawledAccount.value = task.result
-          accountSuccess.value = '获取成功！所有谱子已添加到谱库'
+          accountSuccess.value = task.failedCount > 0
+            ? `爬取完成：成功 ${task.successCount} 首，失败 ${task.failedCount} 首`
+            : '获取成功！所有谱子已添加到谱库'
           progressPercent.value = 100
           accountUrl.value = ''
         } else if (task.status === 'FAILED') {
-          clearInterval(pollInterval)
+          stopAccountPoll()
           accountLoading.value = false
           accountProgress.value = ''
+          accountQueueHint.value = ''
           accountError.value = task.error || '爬取失败'
           progressPercent.value = 0
         }
       } else {
-        clearInterval(pollInterval)
+        stopAccountPoll()
         accountLoading.value = false
         accountProgress.value = ''
+        accountQueueHint.value = ''
       }
     } catch (err) {
       console.error('查询任务状态失败:', err)
-      clearInterval(pollInterval)
+      stopAccountPoll()
       accountLoading.value = false
       accountProgress.value = ''
+      accountQueueHint.value = ''
       accountError.value = '查询任务状态失败'
     }
   }, 2000)
 
-  setTimeout(() => {
-    clearInterval(pollInterval)
-    if (accountLoading.value) {
-      accountLoading.value = false
-      accountProgress.value = ''
-      accountError.value = '任务超时，请稍后查看谱库'
-    }
-  }, 300000)
+  releaseAccountPoll = () => {
+    window.clearInterval(pollInterval)
+    window.clearTimeout(hintTimer)
+  }
 }
+
+onBeforeUnmount(() => {
+  stopAccountPoll()
+})
 
 const goToLibrary = () => {
   router.push('/library')

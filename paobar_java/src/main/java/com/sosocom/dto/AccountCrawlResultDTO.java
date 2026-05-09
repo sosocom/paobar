@@ -33,7 +33,18 @@ public class AccountCrawlResultDTO {
     private Integer failedCount;
     
     /**
-     * 跳过的歌曲数（已存在）
+     * 跳过的歌曲数（已存在）。
+     * 新流程下 = alreadyInLibrary（爬取前就在 song 表里）+ alreadyPending
+     * （已经在 crawler_task 队列里 PENDING/PROCESSING）。保留单字段以兼容前端老 UI。
      */
     private Integer skippedCount;
+
+    /** 入队前发现 已在 song 表里 的链接数。 */
+    private Integer alreadyInLibrary;
+
+    /** 入队前发现 已在 crawler_task 队列里待消费 的链接数。 */
+    private Integer alreadyPending;
+
+    /** 实际新加入待爬队列的链接数（= totalFound - alreadyInLibrary - alreadyPending）。 */
+    private Integer enqueued;
 }

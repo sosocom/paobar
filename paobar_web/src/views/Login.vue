@@ -99,7 +99,9 @@ const submit = async () => {
       : await api.register(username.value.trim(), password.value)
     setToken(res.token)
     setStoredUser(res.user)
-    const redirect = (route.query.redirect as string) || '/index'
+    // 默认跳"我的"页，让用户立刻看到账号信息已就绪；
+    // 有显式 redirect（来自 router guard 的要求登录）则遵守
+    const redirect = (route.query.redirect as string) || '/profile'
     router.replace(redirect)
   } catch (e: any) {
     error.value = e?.message || (isLogin.value ? '登录失败' : '注册失败')

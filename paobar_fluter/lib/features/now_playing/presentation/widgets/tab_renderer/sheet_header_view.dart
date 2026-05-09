@@ -6,9 +6,9 @@ import 'package:paobar/features/now_playing/presentation/widgets/tab_renderer/ta
 /// 谱面头部：标题 + 唱/编 info + 2x2 / 4x1 meta 带。
 /// 完全对齐 NowPlaying.vue 里 sheet-header 的结构与视觉。
 class SheetHeaderView extends StatelessWidget {
-  const SheetHeaderView({required this.header, super.key});
+  const SheetHeaderView({required this.document, super.key});
 
-  final SheetHeader header;
+  final TabDocument document;
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +16,10 @@ class SheetHeaderView extends StatelessWidget {
     final compact = context.screenType.isCompact;
 
     final metaCols = <({String label, String value})>[
-      if (header.meter != null) (label: '拍号', value: header.meter!),
-      if (header.bpm != null) (label: '拍速', value: header.bpm!),
-      if (header.capoKey != null) (label: '选调', value: header.capoKey!),
-      if (header.originalKey != null) (label: '原唱调', value: header.originalKey!),
+      if (document.meter != null) (label: '拍号', value: document.meter!),
+      if (document.bpm != null) (label: '拍速', value: document.bpm!),
+      if (document.capoKey != null) (label: '选调', value: document.capoKey!),
+      if (document.originalKey != null) (label: '原唱调', value: document.originalKey!),
     ];
 
     return Container(
@@ -37,7 +37,7 @@ class SheetHeaderView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            header.title,
+            document.title ?? '',
             style: TextStyle(
               fontSize: compact ? 22 : 26,
               fontWeight: FontWeight.w600,
@@ -46,13 +46,13 @@ class SheetHeaderView extends StatelessWidget {
               letterSpacing: 1,
             ),
           ),
-          if (header.info.isNotEmpty) ...[
+          if (document.info.isNotEmpty) ...[
             const SizedBox(height: 8),
             Wrap(
               spacing: 24,
               runSpacing: 4,
               children: [
-                for (final i in header.info)
+                for (final i in document.info)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.baseline,

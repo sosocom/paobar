@@ -13,34 +13,35 @@ import 'package:paobar/core/platform/platform_info.dart';
 import 'package:paobar/core/platform/url_strategy.dart' as url_strategy;
 
 /// 统一入口，负责：
-/// - 初始化 Flutter binding
+/// - 初始化 Flutter binding（必须与 runApp 在同一个 Zone）
 /// - 打日志设定 + BlocObserver
 /// - DI 配置
 /// - 全局错误捕获
 /// - 启动 MaterialApp
 Future<void> bootstrap() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Web：使用 path-based URL，不带 #，利于 SEO 和深链分享
-  if (PlatformInfo.isWeb) {
-    url_strategy.usePathUrlStrategy();
-  }
-
-  // 桌面端：最小窗口尺寸，防止布局崩到移动端之下
-  if (PlatformInfo.isDesktop) {
-    await DesktopWindow.configure();
-  }
-
-  // 全局错误捕获（Flutter 框架 + Zone 之外的异步错误）
+  // 全局错误捕获（Flutter 框架自身错误）
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     if (!kDebugMode) {
-      // TODO: 接入 Sentry / Firebase Crashlytics
+      // ignore: unused_element
+      // TODO(observability): 接入 Sentry / Firebase Crashlytics
     }
   };
 
   await runZonedGuarded<Future<void>>(
     () async {
+      // `ensureInitialized` 必须与 `runApp` 处于同一个 Zone，否则 Flutter 3.22+
+      // 会报 Zone mismatch 警告。所以放在 runZonedGuarded 内部。
+      WidgetsFlutterBinding.ensureInitialized();
+
+      if (PlatformInfo.isWeb) {
+        url_strategy.usePathUrlStrategy();
+      }
+
+      if (PlatformInfo.isDesktop) {
+        await DesktopWindow.configure();
+      }
+
       await configureDependencies();
 
       Bloc.observer = AppBlocObserver();

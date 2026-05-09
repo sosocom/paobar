@@ -6,12 +6,28 @@ import 'package:paobar/core/widgets/selectable_error_text.dart';
 class ErrorView extends StatelessWidget {
   const ErrorView({
     required this.message,
-    this.onRetry,
+    this.onAction,
+    this.actionLabel = '重试',
+    this.actionIcon = LucideIcons.rotateCcw,
     super.key,
   });
 
   final String message;
-  final VoidCallback? onRetry;
+  final VoidCallback? onAction;
+  final String actionLabel;
+  final IconData actionIcon;
+
+  /// 兼容旧调用方：`ErrorView(message: ..., onRetry: ...)`。
+  factory ErrorView.retry({
+    Key? key,
+    required String message,
+    VoidCallback? onRetry,
+  }) =>
+      ErrorView(
+        key: key,
+        message: message,
+        onAction: onRetry,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +44,12 @@ class ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             SelectableErrorText(message),
-            if (onRetry != null) ...[
+            if (onAction != null) ...[
               const SizedBox(height: 16),
               OutlinedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(LucideIcons.rotateCcw, size: 16),
-                label: const Text('重试'),
+                onPressed: onAction,
+                icon: Icon(actionIcon, size: 16),
+                label: Text(actionLabel),
               ),
             ],
           ],

@@ -41,9 +41,6 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
-  # HTML 解析（谱面渲染器）
-  html: ^0.15.5
-
   # UI / 平台
   cached_network_image: ^3.4.1
   lucide_icons: ^0.257.0

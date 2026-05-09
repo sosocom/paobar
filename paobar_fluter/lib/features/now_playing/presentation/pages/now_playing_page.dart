@@ -5,9 +5,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paobar/app/theme/app_colors.dart';
 import 'package:paobar/core/di/injector.dart';
 import 'package:paobar/core/widgets/empty_view.dart';
-import 'package:paobar/core/widgets/error_view.dart';
+import 'package:paobar/core/widgets/failure_view.dart';
 import 'package:paobar/core/widgets/loading_view.dart';
-import 'package:paobar/core/errors/failure.dart';
 import 'package:paobar/features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'package:paobar/features/now_playing/presentation/cubit/now_playing_cubit.dart';
 import 'package:paobar/features/now_playing/presentation/cubit/now_playing_state.dart';
@@ -38,13 +37,23 @@ class NowPlayingPage extends StatelessWidget {
           value: sl<FavoritesCubit>()..ensureLoaded(),
         ),
       ],
-      child: _NowPlayingView(fromPlaylist: playlistId != null),
+      child: _NowPlayingView(
+        songId: songId,
+        playlistId: playlistId,
+        fromPlaylist: playlistId != null,
+      ),
     );
   }
 }
 
 class _NowPlayingView extends StatefulWidget {
-  const _NowPlayingView({required this.fromPlaylist});
+  const _NowPlayingView({
+    required this.songId,
+    required this.playlistId,
+    required this.fromPlaylist,
+  });
+  final String songId;
+  final String? playlistId;
   final bool fromPlaylist;
 
   @override
@@ -72,7 +81,7 @@ class _NowPlayingViewState extends State<_NowPlayingView> {
       builder: (context, state) {
         return Scaffold(
           appBar: _buildAppBar(context, state),
-          body: _buildBody(state),
+          body: _buildBody(context, state),
           bottomSheet: widget.fromPlaylist ? _BottomBar(scale: _scale) : null,
         );
       },
@@ -124,12 +133,15 @@ class _NowPlayingViewState extends State<_NowPlayingView> {
     );
   }
 
-  Widget _buildBody(NowPlayingState state) {
+  Widget _buildBody(BuildContext context, NowPlayingState state) {
     if (state.loading) return const LoadingView();
     if (state.failure != null) {
-      return ErrorView(
-        message: state.failure!.displayMessage,
-        onRetry: () {},
+      return FailureView(
+        failure: state.failure!,
+        onRetry: () => context.read<NowPlayingCubit>().load(
+          songId: widget.songId,
+          playlistId: widget.playlistId,
+        ),
       );
     }
     final doc = state.document;

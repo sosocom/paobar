@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:paobar/features/now_playing/presentation/widgets/tab_renderer/tab_document.dart';
 
-/// 对齐 `paobar_web/src/types/index.ts` 的 Song interface。
+/// 对齐后端 `SongDTO`。注意：原来的 HTML 字段 `tabContent` 已被移除，改成结构化的
+/// [tabDocument]（爬虫入库时规范化生成），前端不再做 HTML 解析。
 class Song extends Equatable {
   const Song({
     required this.id,
@@ -8,7 +10,7 @@ class Song extends Equatable {
     required this.artist,
     this.originalUrl,
     this.lyrics,
-    this.tabContent,
+    this.tabDocument,
     this.tabImageUrl,
     this.meta,
     this.difficulty,
@@ -26,7 +28,7 @@ class Song extends Equatable {
   final String artist;
   final String? originalUrl;
   final String? lyrics;
-  final String? tabContent;
+  final TabDocument? tabDocument;
   final String? tabImageUrl;
   final String? meta;
   final String? difficulty;
@@ -45,7 +47,7 @@ class Song extends Equatable {
         artist,
         originalUrl,
         lyrics,
-        tabContent,
+        tabDocument,
         tabImageUrl,
         meta,
         difficulty,

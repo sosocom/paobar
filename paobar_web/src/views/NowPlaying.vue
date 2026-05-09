@@ -18,8 +18,29 @@
         <h1 class="text-lg font-semibold truncate">{{ currentSong?.title }}</h1>
         <span v-if="currentSong?.artist" class="text-sm text-text-secondary whitespace-nowrap">{{ currentSong.artist }}</span>
       </div>
-      <!-- Right Actions: Favorite + Add to Playlist -->
+      <!-- Right Actions: Drum Machine + Chord Mode Toggle + Favorite + Add to Playlist -->
       <div class="flex items-center gap-1 flex-shrink-0">
+        <button
+          @click="toggleDrumMachine"
+          class="p-1.5 rounded-lg transition-colors"
+          :title="showDrumMachine ? '收起鼓机' : '展开鼓机'"
+          aria-label="鼓机"
+        >
+          <Drum
+            :size="20"
+            :class="showDrumMachine ? 'text-primary' : 'text-text-secondary'"
+          />
+        </button>
+        <button
+          @click="toggleChordMode"
+          class="p-1.5 rounded-lg transition-colors"
+          :title="chordMode === 'diagram' ? '切换到级数图' : '切换到和弦图'"
+        >
+          <Guitar
+            :size="20"
+            :class="chordMode === 'diagram' ? 'text-primary' : 'text-text-secondary'"
+          />
+        </button>
         <button
           @click="toggleFavorite"
           class="p-1.5 rounded-lg transition-colors"
@@ -41,61 +62,130 @@
       </div>
     </header>
 
-    <!-- Song Info Bar -->
-    <div v-if="currentSong?.meta" class="bg-background-card/50 px-4 py-3 border-b border-white/5">
-      <div class="text-xs text-text-secondary text-center">
-        {{ currentSong.meta }}
-      </div>
-    </div>
+    <!-- 鼓机面板：懒加载（只有第一次展开才下载 tone.js + 组件代码）。
+         不依赖 currentSong —— Tone 引擎在 drumBus 里全局常驻，切歌瞬间 currentSong
+         会短暂变 undefined，但组件保持挂载可以避免视觉闪烁；DrumMachine 内部
+         watch 空 props 时会把 null 传给 bus.setSongContext，由 bus 自行兜底。 -->
+    <Transition name="drum-slide">
+      <DrumMachine
+        v-if="showDrumMachine"
+        :meter="currentSong?.tabDocument?.meter ?? null"
+        :bpm-raw="currentSong?.tabDocument?.bpm ?? null"
+        :song-id="currentSong?.id ?? null"
+      />
+    </Transition>
 
     <!-- Chord Sheet Content -->
     <div
       ref="sheetContainer"
-      class="px-4 py-6 overflow-y-auto overflow-x-hidden"
-      :class="fromPlaylist ? 'pb-32' : 'pb-8'"
-      :style="fromPlaylist ? 'height: calc(100vh - 180px)' : 'height: calc(100vh - 100px)'"
+      class="px-4 pt-1 pb-6 overflow-y-auto overflow-x-hidden"
+      :class="fromPlaylist ? 'pb-16' : 'pb-8'"
+      :style="sheetHeightStyle"
     >
-      <!-- HTML渲染的吉他谱内容：动态缩放铺满一屏，居中 -->
-      <div 
-        v-if="currentSong?.tabContent" 
+      <!-- 按需拉取当前歌曲详情时的小 loading -->
+      <div v-if="detailLoading" class="text-center text-text-secondary py-8">
+        <div class="inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-xs mt-2">正在加载吉他谱...</p>
+      </div>
+
+      <!-- 结构化渲染的吉他谱：动态缩放铺满一屏，居中 -->
+      <div
+        v-else-if="currentSong?.tabDocument"
         ref="sheetContent"
         class="tab-content-html"
+        :class="chordMode === 'diagram' ? 'mode-diagram' : 'mode-number'"
         :style="{
           width: 'fit-content',
           margin: '0 auto',
           transformOrigin: 'top center',
           transform: `scale(${contentScale})`,
         }"
-        v-html="currentSong.tabContent"
-      ></div>
-      
-      <!-- 如果没有tabContent，显示占位符 -->
+      >
+        <div class="xhe-sheet">
+          <!-- 头部信息条：只保留拍号 / 拍速 / 选调 / 原唱调 一行展示。
+               标题、唱/词/曲等已在页面顶部 header 体现，不再重复占版面。 -->
+          <div v-if="metaCols.length" class="sheet-header">
+            <div class="meta">
+              <div v-for="col in metaCols" :key="col.label" class="col">
+                <span class="label">{{ col.label }}</span>
+                <span class="value">{{ col.value }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 谱体：headline / paragraph(segments) / blank -->
+          <div class="xhe-body">
+            <template
+              v-for="(block, i) in currentSong.tabDocument.blocks"
+              :key="'block-' + i"
+            >
+              <xhe-headline v-if="block.type === 'headline'">
+                <div text-value>{{ block.text }}</div>
+              </xhe-headline>
+              <div v-else-if="block.type === 'paragraph'" class="xhe-paragraph">
+                <template
+                  v-for="(seg, j) in block.segments"
+                  :key="'seg-' + i + '-' + j"
+                >
+                  <xhe-text v-if="seg.type === 'text'">{{ seg.text }}</xhe-text>
+                  <xhe-chord-anchor
+                    v-else
+                    :data-chord="seg.chord"
+                    :data-value-length="seg.text.length"
+                  >
+                    <div class="chord">
+                      <ChordDiagram
+                        v-if="chordMode === 'diagram'"
+                        :chord="seg.chord"
+                        :capo-key="currentSong.tabDocument.capoKey || currentSong.tabDocument.originalKey"
+                      />
+                      <template v-else>{{ seg.chord }}</template>
+                    </div>
+                    <div class="text">{{ seg.text }}</div>
+                  </xhe-chord-anchor>
+                </template>
+              </div>
+              <div v-else class="xhe-blank"></div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- 没有 tabDocument 时的占位符 -->
       <div v-else class="text-center text-text-secondary py-12">
         <p>暂无吉他谱内容</p>
       </div>
     </div>
 
     <!-- Bottom Control Bar - Only show when from playlist -->
-    <div v-if="fromPlaylist" class="fixed bottom-0 left-0 right-0 bg-background-card/95 backdrop-blur-xl px-4 py-6 border-t border-white/5">
-      <div class="flex items-center justify-between gap-5">
+    <div v-if="fromPlaylist" class="fixed bottom-0 left-0 right-0 bg-background-card/95 backdrop-blur-xl px-3 py-2 border-t border-white/5">
+      <div class="flex items-center gap-2">
         <!-- Prev Section -->
-        <button @click="prevSong" class="flex flex-col items-center gap-1" :disabled="currentIndex === 0">
-          <SkipBack :size="28" :class="currentIndex === 0 ? 'text-text-secondary/30' : 'text-text-primary'" />
-          <span class="text-xs text-text-secondary truncate max-w-[80px]">{{ prevSongName }}</span>
+        <button
+          @click="prevSong"
+          class="flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1 rounded-md disabled:opacity-40"
+          :disabled="currentIndex === 0"
+        >
+          <SkipBack :size="16" class="text-text-primary flex-shrink-0" />
+          <span class="text-xs text-text-secondary truncate">{{ prevSongName || '上一首' }}</span>
         </button>
-        
-        <!-- List Button -->
-        <button @click="togglePlaylist" class="flex flex-col items-center gap-1">
-          <div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-            <ListMusic :size="28" class="text-white" />
-          </div>
-          <span class="text-xs font-semibold text-text-primary">{{ currentIndex + 1 }}/{{ playlist.length }}</span>
+
+        <!-- Center: text-only counter -->
+        <button
+          @click="togglePlaylist"
+          class="px-3 py-1 rounded-full bg-primary/15 text-primary font-semibold text-sm flex-shrink-0"
+        >
+          {{ currentIndex + 1 }}/{{ playlist.length }}
         </button>
-        
+
         <!-- Next Section -->
-        <button @click="nextSong" class="flex flex-col items-center gap-1" :disabled="currentIndex === playlist.length - 1">
-          <SkipForward :size="28" :class="currentIndex === playlist.length - 1 ? 'text-text-secondary/30' : 'text-text-primary'" />
-          <span class="text-xs text-text-secondary truncate max-w-[80px]">{{ nextSongName }}</span>
+        <button
+          @click="nextSong"
+          class="flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1 rounded-md justify-end disabled:opacity-40"
+          :disabled="currentIndex === playlist.length - 1"
+        >
+          <span class="text-xs text-text-secondary truncate">{{ nextSongName || '下一首' }}</span>
+          <SkipForward :size="16" class="text-text-primary flex-shrink-0" />
         </button>
       </div>
     </div>
@@ -165,26 +255,34 @@
           </div>
           
           <!-- Bottom Control Bar in Drawer -->
-          <div class="px-4 py-3 border-t border-white/5">
-            <div class="flex items-center justify-between gap-5">
+          <div class="px-3 py-2 border-t border-white/5">
+            <div class="flex items-center gap-2">
               <!-- Prev Section -->
-              <button @click="prevSong" class="flex flex-col items-center gap-1" :disabled="currentIndex === 0">
-                <SkipBack :size="28" :class="currentIndex === 0 ? 'text-text-secondary/30' : 'text-text-primary'" />
-                <span class="text-xs text-text-secondary truncate max-w-[80px]">{{ prevSongName }}</span>
+              <button
+                @click="prevSong"
+                class="flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1 rounded-md disabled:opacity-40"
+                :disabled="currentIndex === 0"
+              >
+                <SkipBack :size="16" class="text-text-primary flex-shrink-0" />
+                <span class="text-xs text-text-secondary truncate">{{ prevSongName || '上一首' }}</span>
               </button>
-              
-              <!-- List Button -->
-              <button @click="togglePlaylist" class="flex flex-col items-center gap-1">
-                <div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-                  <ListMusic :size="28" class="text-white" />
-                </div>
-                <span class="text-xs font-semibold text-text-primary">{{ currentIndex + 1 }}/{{ playlist.length }}</span>
+
+              <!-- Center: text-only counter -->
+              <button
+                @click="togglePlaylist"
+                class="px-3 py-1 rounded-full bg-primary/15 text-primary font-semibold text-sm flex-shrink-0"
+              >
+                {{ currentIndex + 1 }}/{{ playlist.length }}
               </button>
-              
+
               <!-- Next Section -->
-              <button @click="nextSong" class="flex flex-col items-center gap-1" :disabled="currentIndex === playlist.length - 1">
-                <SkipForward :size="28" :class="currentIndex === playlist.length - 1 ? 'text-text-secondary/30' : 'text-text-primary'" />
-                <span class="text-xs text-text-secondary truncate max-w-[80px]">{{ nextSongName }}</span>
+              <button
+                @click="nextSong"
+                class="flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1 rounded-md justify-end disabled:opacity-40"
+                :disabled="currentIndex === playlist.length - 1"
+              >
+                <span class="text-xs text-text-secondary truncate">{{ nextSongName || '下一首' }}</span>
+                <SkipForward :size="16" class="text-text-primary flex-shrink-0" />
               </button>
             </div>
           </div>
@@ -235,13 +333,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ChevronLeft, SkipBack, SkipForward, ListMusic, Music, Heart, Plus } from 'lucide-vue-next'
+import { ref, computed, defineAsyncComponent, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
+import { ChevronLeft, SkipBack, SkipForward, ListMusic, Music, Heart, Plus, Guitar, Drum } from 'lucide-vue-next'
 import { api } from '@/api'
 import { isLoggedIn } from '@/auth'
 import { requireLogin } from '@/authBus'
-import type { Song, Playlist as PlaylistType } from '@/types'
+import type { Song, Playlist as PlaylistType, TabDocument } from '@/types'
+import ChordDiagram from '@/components/ChordDiagram.vue'
+import {
+  panelOpen as drumPanelOpen,
+  togglePanelOpen as toggleDrumPanel,
+  requestStopDrum,
+} from '@/drumPanelState'
+// 鼓机组件异步加载：tone.js (~70KB) 只在用户真的点开鼓机时才下载。
+// NowPlaying 不直接 import drumBus（那个文件 static import 了 Tone），
+// 所以 panelOpen / togglePanelOpen 只从 drumPanelState 拿，保持主包体积。
+const DrumMachine = defineAsyncComponent(() => import('@/components/DrumMachine.vue'))
 
 const router = useRouter()
 const route = useRoute()
@@ -249,6 +357,31 @@ const currentIndex = ref(0)
 const showPlaylist = ref(false)
 const playlist = ref<Song[]>([])
 const loading = ref(false)
+// 歌单列表接口只返回轻量 DTO（不含 tabDocument），切到该曲时若还没详情则按需拉一次。
+const detailLoading = ref(false)
+
+// ---- 和弦展示模式（级数 / 和弦图），偏好持久化到 localStorage ----
+const CHORD_MODE_KEY = 'paobar.chord-mode'
+type ChordMode = 'number' | 'diagram'
+const chordMode = ref<ChordMode>(
+  (typeof localStorage !== 'undefined' && (localStorage.getItem(CHORD_MODE_KEY) as ChordMode)) || 'number'
+)
+const toggleChordMode = () => {
+  chordMode.value = chordMode.value === 'number' ? 'diagram' : 'number'
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(CHORD_MODE_KEY, chordMode.value)
+  }
+  // 切模式后 line-height 会变，整体内容高度变化，重新算一次缩放。
+  nextTick(() => calcContentScale())
+}
+
+// ---- 鼓机面板显隐：状态与持久化在 drumBus 里全局管理，
+//      这样不同页面/组件共享同一个开关，切歌 / 重挂载都能保持"上次是开的"。
+const showDrumMachine = drumPanelOpen
+const toggleDrumMachine = () => {
+  toggleDrumPanel()
+  nextTick(() => calcContentScale())
+}
 
 // ---- 内容自适应缩放 ----
 const sheetContainer = ref<HTMLElement | null>(null)
@@ -261,7 +394,6 @@ const contentScale = ref(1)
  * - 内容高度 >= 容器可用高度 → 保持原始大小，正常滚动
  */
 const calcContentScale = () => {
-  // 先重置为 1 以获取真实尺寸
   contentScale.value = 1
   nextTick(() => {
     const container = sheetContainer.value
@@ -281,12 +413,10 @@ const calcContentScale = () => {
   })
 }
 
-// 窗口大小变化时重新计算
 const onResize = () => calcContentScale()
 onMounted(() => window.addEventListener('resize', onResize))
 onUnmounted(() => window.removeEventListener('resize', onResize))
 
-// 收藏相关
 const favoriteIds = ref<Set<string>>(new Set())
 const togglingFav = ref(false)
 const isFavorited = computed(() => {
@@ -294,37 +424,42 @@ const isFavorited = computed(() => {
   return song ? favoriteIds.value.has(song.id) : false
 })
 
-// 添加到歌单相关
 const showAddDialog = ref(false)
 const userPlaylists = ref<PlaylistType[]>([])
 const addingToPlaylist = ref(false)
 const addMsg = ref('')
 const addMsgOk = ref(false)
 
-// 判断是否来自歌单
 const fromPlaylist = computed(() => {
   return route.query.playlistId !== undefined
 })
 
-// 加载播放列表
+// 鼓机面板近似高度（两行 + 间距 + 可能的提示文案），写死足以覆盖展开态的最大值；
+// 小一点的瑕疵是显示 iOS 提示时底部可能稍有富余，视觉上无感。
+const DRUM_PANEL_HEIGHT = 110
+const sheetHeightStyle = computed(() => {
+  // 底部导航做小后实际高度 ~46px（py-2 + 28px 按钮 + 1px border），
+  // 给 iOS 安全区/视觉呼吸再多留一点。
+  const base = fromPlaylist.value ? 64 : 60
+  const extra = showDrumMachine.value ? DRUM_PANEL_HEIGHT : 0
+  return `height: calc(100dvh - var(--status-height) - ${base + extra}px)`
+})
+
 const loadPlaylist = async () => {
   loading.value = true
   try {
     const songId = route.params.id as string
     const playlistId = route.query.playlistId as string
-    
+
     if (playlistId) {
-      // 来自歌单，加载该歌单的歌曲
       playlist.value = await api.getPlaylistSongs(playlistId)
     } else {
-      // 来自谱库或其他地方，只加载当前歌曲
       const song = await api.getSongById(songId)
       if (song) {
         playlist.value = [song]
       }
     }
-    
-    // 找到当前歌曲在列表中的索引
+
     if (songId && playlist.value.length > 0) {
       const index = playlist.value.findIndex(song => song.id === songId)
       if (index !== -1) {
@@ -335,12 +470,32 @@ const loadPlaylist = async () => {
     console.error('Failed to load playlist:', error)
   } finally {
     loading.value = false
-    // 加载完成后计算内容缩放
+    // 列表接口不带 tabDocument，单曲接口带。这里统一补齐当前曲目的详情。
+    await ensureCurrentDetail()
     nextTick(() => calcContentScale())
   }
 }
 
-// 监听路由变化，更新当前歌曲索引
+/**
+ * 如果当前曲目还没有 tabDocument（典型是从歌单列表进来），
+ * 这里按需拉一次 `/api/songs/:id` 并把详情合并回 playlist。
+ */
+const ensureCurrentDetail = async () => {
+  const song = playlist.value[currentIndex.value]
+  if (!song || song.tabDocument) return
+  detailLoading.value = true
+  try {
+    const detail = await api.getSongById(song.id)
+    if (detail) {
+      playlist.value.splice(currentIndex.value, 1, { ...song, ...detail })
+    }
+  } catch (e) {
+    console.error('Failed to load song detail:', e)
+  } finally {
+    detailLoading.value = false
+  }
+}
+
 watch(() => route.params.id, (newId) => {
   if (newId && playlist.value.length > 0) {
     const index = playlist.value.findIndex(song => song.id === newId)
@@ -355,10 +510,44 @@ onMounted(() => {
   loadFavoriteIds()
 })
 
+// 离开 NowPlaying 路由时让鼓机停下来（切歌仍留在本路由，不会触发）。
+// requestStopDrum 走 window event，drumBus 未加载时是空操作，不会把 Tone 拉进主包。
+onBeforeRouteLeave((to) => {
+  if (to.name !== 'NowPlaying') {
+    requestStopDrum()
+  }
+})
+
 const currentSong = computed(() => playlist.value[currentIndex.value])
 
-// 歌曲切换时重新计算缩放
-watch(currentSong, () => {
+// 记录播放历史：每次 currentSong.id 真正变化时（首次加载 / 列表内切歌 / 路由跳转）
+// 都向后端 upsert 一条记录。未登录时 api 内部会静默忽略。
+// 用一个 Set 去重，防止 watch 触发两次（例如 loadPlaylist + route watch 同时命中）。
+const recordedIds = new Set<string>()
+watch(() => currentSong.value?.id, (id) => {
+  if (!id) return
+  if (recordedIds.has(id)) return
+  recordedIds.add(id)
+  api.recordPlayHistory(id)
+}, { immediate: true })
+
+// 顶部信息栏里四格 meta 的展平逻辑，顺序固定为 拍号 / 拍速 / 选调 / 原唱调。
+const metaCols = computed<Array<{ label: string; value: string }>>(() => {
+  const doc: TabDocument | undefined = currentSong.value?.tabDocument
+  if (!doc) return []
+  const candidates: Array<{ label: string; value?: string }> = [
+    { label: '拍号', value: doc.meter },
+    { label: '拍速', value: doc.bpm },
+    { label: '选调', value: doc.capoKey },
+    { label: '原唱调', value: doc.originalKey },
+  ]
+  return candidates
+    .filter((c): c is { label: string; value: string } => !!c.value && c.value.trim() !== '')
+})
+
+// 切歌后既要刷新详情又要重算缩放
+watch(currentSong, async () => {
+  await ensureCurrentDetail()
   nextTick(() => calcContentScale())
 })
 
@@ -380,7 +569,6 @@ const prevSong = () => {
   if (currentIndex.value > 0) {
     currentIndex.value--
     const playlistId = route.query.playlistId as string
-    // 更新路由，保持 playlistId 参数
     router.replace({ 
       name: 'NowPlaying', 
       params: { id: playlist.value[currentIndex.value].id },
@@ -393,7 +581,6 @@ const nextSong = () => {
   if (currentIndex.value < playlist.value.length - 1) {
     currentIndex.value++
     const playlistId = route.query.playlistId as string
-    // 更新路由，保持 playlistId 参数
     router.replace({ 
       name: 'NowPlaying', 
       params: { id: playlist.value[currentIndex.value].id },
@@ -410,7 +597,6 @@ const playSongAtIndex = (idx: number) => {
   currentIndex.value = idx
   showPlaylist.value = false
   const playlistId = route.query.playlistId as string
-  // 更新路由，保持 playlistId 参数
   router.replace({ 
     name: 'NowPlaying', 
     params: { id: playlist.value[idx].id },
@@ -492,6 +678,23 @@ const addSongToPlaylist = async (plId: string) => {
 </script>
 
 <style scoped>
+/* Drum machine slide-down transition */
+.drum-slide-enter-active,
+.drum-slide-leave-active {
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+  overflow: hidden;
+}
+.drum-slide-enter-from,
+.drum-slide-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+.drum-slide-enter-to,
+.drum-slide-leave-from {
+  max-height: 200px;
+  opacity: 1;
+}
+
 /* Dialog transition */
 .dialog-enter-active,
 .dialog-leave-active {
@@ -526,18 +729,21 @@ const addSongToPlaylist = async (plId: string) => {
 }
 
 /* ================================================================= *
- * 吉他谱渲染 —— 对齐 yopu.co 原版 xhe-sheet 布局
- *   实际 HTML 结构（来自 SeleniumCrawler 保存）:
- *     .sheet-container > .xhe-sheet
+ * 吉他谱渲染 —— 数据来自规范化 TabDocument（schemaVersion=1）
+ *   DOM 结构（由模板渲染生成，保留 yopu 风格的 xhe-* 标签以沿用视觉）：
+ *     .tab-content-html > .xhe-sheet
  *       > .sheet-header  .title / .info .item{.label,.text} / .meta .col{.label,.value}
  *       > .xhe-body
  *           <xhe-headline><div text-value>段落名</div></xhe-headline>
- *           <xhe-text>歌词...</xhe-text>
- *           <xhe-chord-anchor data-chord="1">
- *             <div class="chord">1<span class="chord-type">m</span></div>
- *             <div class="text">字</div>
- *           </xhe-chord-anchor>
- *           <xhe-line-break><br></xhe-line-break>
+ *           <div class="xhe-paragraph">              一整行歌词（块级）
+ *             <xhe-text>歌词片段</xhe-text>
+ *             <xhe-chord-anchor data-chord="3m" data-value-length="1">
+ *               <div class="chord">3m</div>
+ *               <div class="text">字</div>
+ *             </xhe-chord-anchor>
+ *             ...
+ *           </div>
+ *           <div class="xhe-blank"></div>       空白分段
  *   主色覆盖原版 --color-accent，统一使用项目红色主调
  * ================================================================= */
 .tab-content-html {
@@ -555,61 +761,30 @@ const addSongToPlaylist = async (plId: string) => {
   color: var(--color-font-main);
   line-height: 1.5;
   letter-spacing: 0.03em;
-  padding: 22px 24px 48px;
+  padding: 0 24px 48px;
   max-width: 820px;
 }
 
 /* ---------- 外层容器 ---------- */
-.tab-content-html :deep(.sheet-container),
 .tab-content-html :deep(.xhe-sheet) {
   position: relative;
   padding: 0;
   background: transparent;
 }
 
-/* ---------- sheet-header：标题 + 演唱 + meta 方块（参考 yopu 桌面布局） ---------- */
+/* ---------- sheet-header：只保留拍号 / 拍速 / 选调 / 原唱调 一行 meta ---------- */
 .tab-content-html :deep(.sheet-header) {
   position: relative;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px dashed var(--meta-border);
+  margin-bottom: 16px;
 }
 
-.tab-content-html :deep(.sheet-header .title) {
-  font-size: 1.7em;
-  font-weight: 600;
-  letter-spacing: 1px;
-  margin: 4px 0 8px;
-  color: var(--color-font-main);
-  word-break: break-all;
-}
-
-.tab-content-html :deep(.sheet-header .info) {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 24px;
-  margin-bottom: 10px;
-}
-
-.tab-content-html :deep(.sheet-header .info .item .label) {
-  margin-right: 6px;
-  font-size: 0.9em;
-  color: var(--accent);
-}
-
-.tab-content-html :deep(.sheet-header .info .item .text) {
-  color: var(--color-font-secondary);
-  font-size: 0.95em;
-}
-
-/* meta 方块（4 格：拍号 / 拍速 / 选调 / 原唱调）——
-   正常流，放在标题下方，一行 4 列，避免与标题重叠 */
+/* 四格 meta 强制单行：任意宽度下都横排，不再换行 */
 .tab-content-html :deep(.sheet-header .meta) {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: 0;
-  margin-top: 6px;
-  padding: 6px 4px;
+  padding: 4px 2px;
   border: 1px solid var(--meta-border);
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.03);
@@ -621,15 +796,14 @@ const addSongToPlaylist = async (plId: string) => {
   justify-content: center;
   gap: 4px;
   box-sizing: border-box;
-  padding: 2px 8px;
+  padding: 2px 6px;
   font-size: 0.85em;
-  line-height: 1.8em;
+  line-height: 1.7em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* 列间竖向分隔线（第 2、3、4 列） */
 .tab-content-html :deep(.sheet-header .meta .col + .col) {
   border-left: 1px solid var(--meta-border);
 }
@@ -643,71 +817,84 @@ const addSongToPlaylist = async (plId: string) => {
   font-weight: 500;
 }
 
-/* 窄屏：4 列改 2 列，保持每格一行内完整显示 */
+/* 窄屏上字再小一点，保证 4 格仍在一行 */
 @media (max-width: 520px) {
-  .tab-content-html :deep(.sheet-header .title) {
-    font-size: 1.4em;
+  .tab-content-html :deep(.sheet-header .meta .col) {
+    padding: 2px 4px;
+    font-size: 0.78em;
   }
-  .tab-content-html :deep(.sheet-header .meta) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .tab-content-html :deep(.sheet-header .meta .col + .col) {
-    border-left: none;
-  }
-  .tab-content-html :deep(.sheet-header .meta .col:nth-child(odd)) {
-    border-right: 1px solid var(--meta-border);
-  }
-  .tab-content-html :deep(.sheet-header .meta .col:nth-child(-n+2)) {
-    border-bottom: 1px solid var(--meta-border);
-  }
-}
-
-/* 如果谱体没有 sheet-header（老数据），我们自己的 xhe-header 占位继续生效 */
-.tab-content-html :deep(.xhe-header) {
-  display: none;
 }
 
 /* ---------- xhe-body 正文 ---------- */
 .tab-content-html :deep(.xhe-body) {
   position: relative;
-  padding: 32px 0 0;   /* 顶部给第一行的和弦文本留出空间 */
+  padding: 6px 0 0;
 }
 
-/* 段落标题（主歌 / 副歌 / Bridge 等） */
+/* 段落标题（主歌 / 副歌 / Bridge 等）—— 红色渐隐"标签条"风格，
+   左侧实心、向右逐渐隐入背景，既保留分段功能又不突兀 */
 .tab-content-html :deep(xhe-headline) {
   display: block;
   position: relative;
-  margin: 1.4em -0.5em 0.7em;
-  padding: 0.3em 0.7em;
-  background-color: var(--headline-bg);
-  border-left: 3px solid var(--accent);
-  border-radius: 4px;
+  margin: -1rem 0 1rem 0;
+  padding: 0.04em 0.55em;
+  background: linear-gradient(
+    to right,
+    rgba(239, 68, 68, 0.22),
+    rgba(239, 68, 68, 0.08) 55%,
+    transparent 100%
+  );
+  border-left: 2px solid var(--accent);
+  border-radius: 3px;
 }
 
 .tab-content-html :deep(xhe-headline [text-value]) {
   display: inline-block;
-  line-height: 1.7em;
-  font-size: 1em;
+  line-height: 1.15em;
+  font-size: 0.78em;
+  font-weight: 500;
   color: var(--color-font-secondary);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
 }
 
-/* 第一个 headline 不要顶端 margin（避免与 xhe-body 内边距叠加） */
 .tab-content-html :deep(.xhe-body > xhe-headline:first-child) {
   margin-top: 0;
 }
 
-/* ---------- 歌词行 ---------- */
-.tab-content-html :deep(xhe-text) {
-  display: inline;
-  line-height: 3.5em;          /* 关键：预留和弦上方空间 */
+/* ---------- 歌词行（段落：一行或多行 chord+lyric） ----------
+ * 和弦空位由 line-height 的 leading 承担，而不是 margin-top —— 这样
+ * 歌词折行时，每个视觉行都会在行盒上方留出和弦位置，chord 不会穿到上一行。
+ * line-height ≈ 3em 是经过计算的最小安全值：
+ *   anchor top = 0.75*line-height - 0.87em（.text baseline 偏移）
+ *   chord height ≈ 0.95em（font-size 0.95em）
+ *   需要 anchor top > chord height + desired-gap，才不会溢出行盒顶部。
+ */
+.tab-content-html :deep(.xhe-paragraph) {
+  display: block;
+  position: relative;
+  line-height: 3em;
+  margin-top: 0.2em;
   color: var(--color-font-main);
   letter-spacing: 0.07em;
 }
 
-/* xhe-line-break 内部有 <br>，让整个元素占一行强制换行 */
-.tab-content-html :deep(xhe-line-break) {
+/* 段落/Headline 紧挨着的第一个段落不再叠加额外 margin */
+.tab-content-html :deep(.xhe-body > .xhe-paragraph:first-child),
+.tab-content-html :deep(xhe-headline + .xhe-paragraph) {
+  margin-top: 0;
+}
+
+.tab-content-html :deep(xhe-text) {
   display: inline;
+  line-height: 3em;
+  color: var(--color-font-main);
+  letter-spacing: 0.07em;
+}
+
+/* 空行分段 */
+.tab-content-html :deep(.xhe-blank) {
+  display: block;
+  height: 0.6em;
 }
 
 /* ---------- 和弦锚点 ---------- */
@@ -721,6 +908,7 @@ const addSongToPlaylist = async (plId: string) => {
   vertical-align: baseline;
 }
 
+/* 没有承载字的纯和弦锚点（比如 intro 段开头的空和弦），留一点宽度 */
 .tab-content-html :deep(xhe-chord-anchor[data-value-length="0"]) {
   min-width: 1em;
   margin-right: 0.15em;
@@ -729,7 +917,12 @@ const addSongToPlaylist = async (plId: string) => {
 /* 和弦文字（数字谱：1 / 6m / 5 / 2m，字母谱：Am / C / G7） */
 .tab-content-html :deep(xhe-chord-anchor > .chord) {
   position: absolute;
-  top: -1.4em;
+  /* 因为 anchor 是 inline-block 继承了段落 line-height=3em，anchor 高度==行盒，
+   * anchor top 就等于当前视觉行的 top。于是：
+   *   chord 底到歌词顶 ≈ |top| + 0.05em
+   *   chord 顶到上一行歌词底 ≈ line-height − |top| − 2em
+   * 目标：chord 贴近本行歌词（约 0.25em），上一行留白 ≈ 0.8em。 */
+  top: -0.2em;
   left: 50%;
   transform: translateX(-50%);
   font-family: Arial, 'Helvetica Neue', sans-serif;
@@ -741,10 +934,6 @@ const addSongToPlaylist = async (plId: string) => {
   user-select: none;
   line-height: 1;
   transition: background-color 1s;
-}
-
-.tab-content-html :deep(xhe-chord-anchor > .chord .chord-type) {
-  font-size: 0.8em;
 }
 
 /* 按住锚点时高亮（桌面端鼠标、移动端触摸） */
@@ -763,56 +952,63 @@ const addSongToPlaylist = async (plId: string) => {
   padding: 0.07em 0 0.21em;
 }
 
-/* ---------- 字母谱可能出现的 hexi-chord 指法图（为将来扩展保留） ---------- */
-.tab-content-html :deep(xhe-chord-anchor hexi-chord) {
-  position: absolute;
-  top: -3.2em;
-  color: var(--accent);
-  user-select: none;
-  line-height: 1;
-}
-
-.tab-content-html :deep(xhe-chord-anchor hexi-chord[instrument="guitar"]) {
-  left: -1em;
-}
-
-.tab-content-html :deep(hexi-chord svg) {
-  display: block;
-  overflow: visible;
-}
-
-.tab-content-html :deep(hexi-chord svg text),
-.tab-content-html :deep(hexi-chord svg *[fill]) {
-  fill: currentColor;
-}
-
 /* 选区高亮 */
-.tab-content-html :deep(xhe-chord-anchor [text-value]::selection),
 .tab-content-html :deep(xhe-headline::selection),
 .tab-content-html :deep(xhe-text::selection) {
   background-color: var(--accent-soft);
 }
 
-/* ---------- 兜底：残留标签 ---------- */
-.tab-content-html :deep(a) {
-  color: var(--accent);
-  text-decoration: underline;
+/* ================================================================= *
+ * 和弦图（diagram）模式：chord 由文字换成 52px 高的 SVG 指法图。
+ *   需要更大的行距承载 SVG，同时把 chord 的 top 往下移，让图整体贴近
+ *   本行歌词、与上一行之间留呼吸。
+ *   SVG 高度 52px ≈ 3.06em（font-size 17px），line-height 5em 给出
+ *   约 0.7em 的上方呼吸 + 0.2em 的下方贴合。
+ * ================================================================= */
+.tab-content-html.mode-diagram :deep(.xhe-paragraph) {
+  /* SVG 渲染高度约 40px（≈2.35em），上方留 ~0.55em 呼吸即可。 */
+  line-height: 3.9em;
 }
 
-.tab-content-html :deep(pre),
-.tab-content-html :deep(code) {
-  font-family: 'Courier New', monospace;
-  color: var(--accent);
+/* diagram 模式下，和弦图有 ~2.35em 高度且绝对定位到首行上方，
+   headline / sheet-header 与其后的段落需要额外留白，避免和弦图压到上方信息条。 */
+.tab-content-html.mode-diagram :deep(xhe-headline) {
+  margin-bottom: 1.6em;
 }
 
-.tab-content-html :deep(pre) {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin: 0;
-  white-space: pre-wrap;
+.tab-content-html.mode-diagram :deep(xhe-headline + .xhe-paragraph) {
+  margin-top: 1em;
+}
+
+/* sheet-header 与紧随其后的首段之间也要给和弦图留位（图 1 反馈：
+   切到和弦图模式时，第一行歌词上方的指法图会顶到拍号 / 拍速信息条）。
+   chord SVG 顶端 = -1.35em，给 ~0.4em 呼吸即可，再多就显得空。 */
+.tab-content-html.mode-diagram :deep(.sheet-header) {
+  margin-bottom: 1.75em;
+}
+
+.tab-content-html.mode-diagram :deep(xhe-text) {
+  line-height: 3.9em;
+}
+
+.tab-content-html.mode-diagram :deep(xhe-chord-anchor > .chord) {
+  /* SVG 本身自带文字和指板，不再需要外层的文字样式。
+     top: -1.35em 让和弦图底边贴到歌词上沿（0 间距）。 */
+  top: -1.35em;
+  font-size: 1em;       /* SVG 走 px 尺寸，这里清除 0.95em 缩放避免叠加 */
+  font-weight: normal;
+  line-height: 1;
+  background: transparent !important;
+}
+
+/* 连续两个带和弦的字：SVG 宽 ~30px 而汉字只有 ~17px，
+   居中叠放会相互遮挡，所以给相邻的第二个 anchor 加左外边距，
+   让两张和弦图之间留出 ~2px 安全间距。 */
+.tab-content-html.mode-diagram :deep(xhe-chord-anchor + xhe-chord-anchor) {
+  margin-left: 1em;
+}
+
+.tab-content-html.mode-diagram :deep(xhe-chord-anchor:active > .chord) {
+  background: transparent !important;
 }
 </style>

@@ -6,10 +6,9 @@ import 'package:paobar/app/router/routes.dart';
 import 'package:paobar/app/theme/app_colors.dart';
 import 'package:paobar/core/di/injector.dart';
 import 'package:paobar/core/widgets/empty_view.dart';
-import 'package:paobar/core/widgets/error_view.dart';
+import 'package:paobar/core/widgets/failure_view.dart';
 import 'package:paobar/core/widgets/loading_view.dart';
 import 'package:paobar/core/widgets/song_tile.dart';
-import 'package:paobar/core/errors/failure.dart';
 import 'package:paobar/features/songs/domain/repositories/songs_repository.dart';
 import 'package:paobar/features/songs/presentation/cubit/songs_list_cubit.dart';
 import 'package:paobar/features/songs/presentation/cubit/songs_list_state.dart';
@@ -121,8 +120,8 @@ class _SongsList extends StatelessWidget {
           return const LoadingView();
         }
         if (state.failure != null && state.songs.isEmpty) {
-          return ErrorView(
-            message: state.failure!.displayMessage,
+          return FailureView(
+            failure: state.failure!,
             onRetry: context.read<SongsListCubit>().load,
           );
         }

@@ -1,3 +1,4 @@
+import 'package:paobar/features/now_playing/presentation/widgets/tab_renderer/tab_document.dart';
 import 'package:paobar/features/songs/domain/entities/song.dart';
 
 class SongModel {
@@ -7,7 +8,7 @@ class SongModel {
     required this.artist,
     this.originalUrl,
     this.lyrics,
-    this.tabContent,
+    this.tabDocument,
     this.tabImageUrl,
     this.meta,
     this.difficulty,
@@ -25,7 +26,7 @@ class SongModel {
   final String artist;
   final String? originalUrl;
   final String? lyrics;
-  final String? tabContent;
+  final TabDocument? tabDocument;
   final String? tabImageUrl;
   final String? meta;
   final String? difficulty;
@@ -38,13 +39,17 @@ class SongModel {
   final int favoriteCount;
 
   factory SongModel.fromJson(Map<String, dynamic> json) {
+    final tabDocRaw = json['tabDocument'];
+    final tabDoc = tabDocRaw is Map<String, dynamic>
+        ? TabDocument.fromJson(tabDocRaw)
+        : null;
     return SongModel(
       id: json['id'].toString(),
       title: json['title']?.toString() ?? '',
       artist: json['artist']?.toString() ?? '',
       originalUrl: json['originalUrl']?.toString(),
       lyrics: json['lyrics']?.toString(),
-      tabContent: json['tabContent']?.toString(),
+      tabDocument: tabDoc,
       tabImageUrl: json['tabImageUrl']?.toString(),
       meta: json['meta']?.toString(),
       difficulty: json['difficulty']?.toString(),
@@ -64,7 +69,7 @@ class SongModel {
         artist: artist,
         originalUrl: originalUrl,
         lyrics: lyrics,
-        tabContent: tabContent,
+        tabDocument: tabDocument,
         tabImageUrl: tabImageUrl,
         meta: meta,
         difficulty: difficulty,

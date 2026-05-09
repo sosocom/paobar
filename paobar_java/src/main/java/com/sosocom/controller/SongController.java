@@ -25,8 +25,9 @@ public class SongController {
     public Result<List<SongDTO>> getSongs(
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        List<SongDTO> songs = songService.getAllSongs(search, page, pageSize);
+            @RequestParam(required = false, defaultValue = "20") Integer pageSize,
+            @RequestParam(required = false) String indexLetter) {
+        List<SongDTO> songs = songService.getAllSongs(search, page, pageSize, indexLetter);
         return Result.success(songs);
     }
 

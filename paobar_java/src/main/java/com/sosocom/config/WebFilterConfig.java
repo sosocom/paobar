@@ -1,5 +1,6 @@
 package com.sosocom.config;
 
+import com.sosocom.mapper.UserMapper;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class WebFilterConfig {
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil) {
-        return new JwtAuthFilter(jwtUtil);
+    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, UserMapper userMapper) {
+        return new JwtAuthFilter(jwtUtil, userMapper);
     }
 
     @Bean

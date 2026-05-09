@@ -52,7 +52,7 @@ public class CrawlerController {
         
         try {
             Song song = crawlerService.executeTask(taskId);
-            SongDTO dto = songService.convertToDTO(song);
+            SongDTO dto = songService.convertToDetailDTO(song);
             return Result.success("爬取成功", dto);
         } catch (Exception e) {
             log.error("执行任务失败", e);
@@ -70,7 +70,7 @@ public class CrawlerController {
         
         try {
             Song song = crawlerService.crawlAndSave(request.getUrl());
-            SongDTO dto = songService.convertToDTO(song);
+            SongDTO dto = songService.convertToDetailDTO(song);
             return Result.success("爬取成功", dto);
         } catch (Exception e) {
             log.error("爬取失败", e);
@@ -97,27 +97,40 @@ public class CrawlerController {
     }
     
     /**
-     * 异步爬取用户账号的所有歌曲
+     * 异步爬取用户账号的所有歌曲（队列化流程）：
+     * <ol>
+     *   <li>同步阶段：拉齐账号下所有谱链接 → 过滤已在库 / 已在队列 → 剩余写入 crawler_task</li>
+     *   <li>异步阶段：唤醒 queue worker，由它逐条消费 PENDING 任务</li>
+     * </ol>
+     * 接口本身的耗时由同步阶段决定（一般 1-5s），实际抓取在后台执行；
+     * 客户端拿到响应后用 userCode 轮询 {@code /crawl-account-status/{userCode}} 看进度。
      */
     @PostMapping("/crawl-account-async")
-    public Result<String> crawlAccountAsync(@RequestBody TaskRequest request) {
+    public Result<com.sosocom.dto.AccountCrawlResultDTO> crawlAccountAsync(@RequestBody TaskRequest request) {
         log.info("异步爬取账号: url={}", request.getUrl());
-        
+
         try {
-            // 提取用户代码
             String userCode = extractUserCodeFromUrl(request.getUrl());
             if (userCode == null || userCode.isEmpty()) {
                 return Result.error("无效的用户链接");
             }
-            
-            // 检查是否已有正在进行的任务
+
+            // 防重复提交：同一账号若仍在 RUNNING 状态，先让它跑完再说
             if (taskManager.isTaskRunning(userCode)) {
                 return Result.error("该账号正在爬取中，请稍后再试");
             }
-            
-            // 开始异步爬取
-            crawlerService.crawlAccountAsync(request.getUrl());
-            return Result.success("爬取任务已提交，正在后台执行", userCode);
+
+            // 1) 同步入队（拉链接 + 过滤 + 落库）
+            com.sosocom.dto.AccountCrawlResultDTO stats = crawlerService.enqueueAccount(request.getUrl());
+
+            // 2) 异步唤醒 worker（fire-and-forget）。需要走 Spring 代理，
+            //   所以这里调用注入进来的 CrawlerService 而不是某个内部 helper
+            crawlerService.triggerQueueWorker();
+
+            log.info("【账号入队】返回前端: total={} alreadyInLib={} alreadyPending={} enqueued={}",
+                    stats.getTotalFound(), stats.getAlreadyInLibrary(),
+                    stats.getAlreadyPending(), stats.getEnqueued());
+            return Result.success("入队完成，已开始后台爬取", stats);
         } catch (Exception e) {
             log.error("提交爬取任务失败", e);
             return Result.error("提交失败: " + e.getMessage());

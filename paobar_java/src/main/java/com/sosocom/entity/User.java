@@ -28,6 +28,9 @@ public class User {
 
     private Integer practiceHours;
 
+    /** 是否管理员：0-普通用户，1-管理员（数据库字段 is_admin）。 */
+    private Integer isAdmin;
+
     private Integer status;
 
     @TableLogic

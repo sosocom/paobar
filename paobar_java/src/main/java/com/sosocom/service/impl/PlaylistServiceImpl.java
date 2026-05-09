@@ -121,6 +121,19 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
+    public boolean deletePlaylist(String id) {
+        Playlist playlist = playlistMapper.selectById(Long.parseLong(id));
+        if (playlist == null || !isOwnPlaylist(playlist)) return false;
+        Long pid = playlist.getId();
+        // 先物理删除歌单-歌曲关联记录（playlist_song 无逻辑删除字段）
+        playlistSongMapper.delete(
+            new LambdaQueryWrapper<PlaylistSong>().eq(PlaylistSong::getPlaylistId, pid)
+        );
+        // 再逻辑删除歌单本身
+        return playlistMapper.deleteById(pid) > 0;
+    }
+
+    @Override
     public boolean addSongToPlaylist(String playlistId, String songId) {
         if (!isOwnPlaylist(playlistMapper.selectById(Long.parseLong(playlistId)))) return false;
         PlaylistSong playlistSong = new PlaylistSong();

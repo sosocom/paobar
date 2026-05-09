@@ -88,6 +88,15 @@ public class PlaylistController {
     }
 
     /**
+     * 删除歌单（仅用户歌单可删）
+     */
+    @DeleteMapping("/{id}")
+    public Result<Boolean> deletePlaylist(@PathVariable String id) {
+        boolean success = playlistService.deletePlaylist(id);
+        return success ? Result.success(true) : Result.error("歌单不存在或不可删除");
+    }
+
+    /**
      * 添加歌曲到歌单
      */
     @PostMapping("/{id}/songs")

@@ -6,10 +6,9 @@ import 'package:paobar/app/router/routes.dart';
 import 'package:paobar/app/theme/app_colors.dart';
 import 'package:paobar/core/di/injector.dart';
 import 'package:paobar/core/widgets/empty_view.dart';
-import 'package:paobar/core/widgets/error_view.dart';
+import 'package:paobar/core/widgets/failure_view.dart';
 import 'package:paobar/core/widgets/loading_view.dart';
 import 'package:paobar/core/widgets/playlist_tile.dart';
-import 'package:paobar/core/errors/failure.dart';
 import 'package:paobar/features/playlists/domain/repositories/playlists_repository.dart';
 import 'package:paobar/features/playlists/presentation/cubit/playlists_cubit.dart';
 import 'package:paobar/features/playlists/presentation/cubit/playlists_state.dart';
@@ -37,8 +36,8 @@ class PlaylistsPage extends StatelessWidget {
               return const LoadingView();
             }
             if (state.failure != null && state.userPlaylists.isEmpty) {
-              return ErrorView(
-                message: state.failure!.displayMessage,
+              return FailureView(
+                failure: state.failure!,
                 onRetry: context.read<PlaylistsCubit>().load,
               );
             }

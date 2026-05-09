@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:paobar/app/router/routes.dart';
 import 'package:paobar/core/di/injector.dart';
 import 'package:paobar/core/widgets/empty_view.dart';
-import 'package:paobar/core/widgets/error_view.dart';
+import 'package:paobar/core/widgets/failure_view.dart';
 import 'package:paobar/core/widgets/loading_view.dart';
 import 'package:paobar/core/widgets/song_tile.dart';
 import 'package:paobar/core/errors/failure.dart';
@@ -24,8 +24,8 @@ class FavoritesPage extends StatelessWidget {
           builder: (context, state) {
             if (state.loading && state.songs.isEmpty) return const LoadingView();
             if (state.failure != null && state.songs.isEmpty) {
-              return ErrorView(
-                message: state.failure!.displayMessage,
+              return FailureView(
+                failure: state.failure!,
                 onRetry: context.read<_FavoritesListCubit>().load,
               );
             }

@@ -28,6 +28,9 @@ lib/l10n_gen/
 # Platform runners（由 flutter create . 生成，不纳入版本库的编译产物）
 android/.gradle/
 android/app/build/
+
+# 本地 CanvasKit 副本（离线开发时用，由 scripts/prepare_web_canvaskit.sh 拷贝）
+web/canvaskit/
 android/local.properties
 android/key.properties
 ios/Pods/
